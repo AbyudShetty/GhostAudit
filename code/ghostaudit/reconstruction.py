@@ -27,7 +27,7 @@ from .parsers import parse_all
 from .scenario import BATCH_HOURS, RELEVANT, UNCERTAIN, UNRELATED, Relevance, WorkflowIndex, assess_relevance
 from .schema import system_for_resource
 from .screenshots import attach_catalog_aliases, load_cache, screenshot_observations
-from .state import Assessment, ResourceState, StateReconstructor, assess
+from .state import Assessment, ResourceState, RulesMismatch, StateReconstructor, assess, check_rules
 
 
 @dataclass(frozen=True)
@@ -80,6 +80,9 @@ def load_evidence(ds: Dataset, graph: IdentityGraph, use_screenshots: bool = Tru
 class CaseReconstructor:
     def __init__(self, ds: Dataset, use_screenshots: bool = True, batch_hours: float = BATCH_HOURS,
                  window_min: Tuple[float, float] = WINDOW_MIN, require_result_match: bool = True):
+        problems = check_rules(ds.rules.rows)
+        if problems:
+            raise RulesMismatch("deletion_rules.csv differs from the treatments this program applies: " + "; ".join(problems))
         self.batch_hours = batch_hours
         self.ds = ds
         self.graph = build_identity_graph(ds)

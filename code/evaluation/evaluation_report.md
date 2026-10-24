@@ -47,10 +47,10 @@ Overall step precision 1.0000, recall 0.9016, F1 0.9482. **Unsupported steps: 0.
 
 | # | Reason we did not emit them | Why this is deliberate |
 |---|---|---|
-| 9 | The resource is not linked to the subject by any identifier visible in the dataset: 7 anonymized analytics profiles that carry no identifier, and 2 retained audit records (`case_18`, `case_20`) | A step must name a resource we can tie to the subject; guessing would be fabricating |
-| 5 | The account could not be named: 3 ambiguous (`case_23`, `28`, `29`; several workers could be the subject's) and 2 unattributed (`case_04`, `08`) | An unresolved account is never guessed. No step is produced |
+| 9 | The resource is not linked to the subject by any identifier visible in the dataset: 7 anonymized analytics profiles that carry no identifier, and 2 retained audit records (`case_18`, `case_20`) | A step must name a resource we can tie to the subject; guessing would be fabricating. The 2 audit records appear in no participant file at all. An anonymized profile is tied to its case only by the deletion worker's `ANONYMIZE_RECORD` row in the case's batch, and 433 of the 508 evaluation deletion cases share their `reported_at` with another case: that tie would be unique for only 17 of the 129 such rows (re-checked 2026-10-25) |
+| 5 | The account could not be named: 3 ambiguous (`case_23`, `28`, `29`; several workers could be the subject's) and 2 unattributed (`case_04`, `08`) | An unresolved account is never guessed. No step is produced. `account_004` is named by no participant file or activity row. `case_08`'s only worker row reports SUCCESS for a PARTIALLY_COMPLETE request; relaxing that result key would recover it but changes no evaluation case (all 252 content-linked evaluation pairs agree with the key), so it would only fit the samples |
 | 3 | Proof withheld by default: 2 rest on an identity inferred from activity (`case_21`, `25`), 1 on a subject-scoped snapshot (`case_31`) | An inferred identity must not become proof that a resource is absent |
-| 2 | No evidence usable at `audit_at` (`case_01`, `case_02`) | Evidence captured later cannot decide the case or be cited |
+| 2 | No evidence names the account at `audit_at` (`case_01`, `case_02`) | The answers cite `evidence_54`, an accounts table that simply does not list these accounts. Non-listing is not accepted as proof of absence (section 8, "Absence"), and the identity of both accounts is inferred from activity, so even with that rule they would be withheld by default |
 
 With `--emit-inferred-proofs` the 3 withheld proofs are emitted and match (verification matched 95, missing 16, all 23 cited ids equal). We do not use it for the submission, for the reason in the table. The choice is a switch, not a hidden assumption.
 
@@ -105,7 +105,7 @@ Points to be aware of:
 | Topic | Choice | What changes if you disagree |
 |---|---|---|
 | Unproven COMPLETE | Labelled COMPLETE, `determination=PARTIAL` (`unproven_status`) | `unproven_status="INCOMPLETE"` would turn 45 COMPLETE evaluation cases into INCOMPLETE; on the samples it would break the 4 PARTIAL agreements |
-| Inferred proofs | Withheld from COMPLETE steps | `--emit-inferred-proofs`: +37 COMPLETE steps (318 -> 355), empty COMPLETE cases 3 -> 2, sample verification matched 92 -> 95 |
+| Inferred proofs | Withheld from COMPLETE steps; one switch per kind (`--emit-proofs inferred-identity / scoped-snapshot / document-or-ocr`), and a proof needs every kind it rests on | See the table below. All three together: +37 COMPLETE steps (318 -> 355), empty COMPLETE cases 3 -> 2, sample verification matched 92 -> 95 |
 | MEDIUM-confidence violations (cached OCR grounded by the catalog, PDF text) | Enabled; LOW-confidence readings never count | `accept_medium_violations=False` would leave the 8 SUPPORTED cases without a violation |
 | Subject-scoped snapshot as absence evidence | Accepted as a weaker tier, never as a step | Off: 31 evaluation cases move INFERRED -> PARTIAL; no status changes |
 | A retained record that is missing | INCOMPLETE, but no finding, because the vocabulary has no operation for it | none available |
@@ -113,6 +113,24 @@ Points to be aware of:
 | Which file to cite when several prove one thing | The most recently captured eligible file, ties to the lower id | matches the answers on 41/41 findings and 20/20 cited verification steps in the samples |
 | Row order of `output.csv` | Numeric (`case_33` before `case_100`), the order of `deletion_requests.csv` and of every other organizer table whose ids mix widths. The statement only says "sorted by `case_id`" and no supplied material settles whether text order was meant | a text sort puts `case_100` first and differs in all 518 positions; set `CASE_ORDER = "lexicographic"` in `ghostaudit/schema.py` (rows are identical, only their order changes). Evidence for both readings: `code/docs/design_decisions.md` |
 | OCR cache | Pre-computed once with the Windows OCR engine and shipped (`ghostaudit/data/screenshot_ocr.json`), keyed by image checksum, so no OCR is needed to run. Names, e-mails and one phone number in it that no result depends on were replaced with same-shape synthetic values; 4 values stay verbatim because scrubbing any one changes a result (`case_39`, `case_52`, `case_53`, `case_55`) | without the cache screenshot evidence is skipped and the 8 SUPPORTED cases would change. The scrub is reproducible and checked: statuses, determinations, violations, proofs, gaps and steps of all 550 cases are identical before and after |
+
+### Inferred-proof policies compared (`python code/analysis/proof_policy_comparison.py`)
+
+Sample figures are our scorer against the 32 supplied answers. For the 518 evaluation requests no answers exist, so only the number of added steps is given; it is not an accuracy figure. No policy changes a status or removes a step.
+
+| Policy | Sample step precision / recall / F1 | Sample steps added (all in the answers) | Evaluation steps added |
+|---|---|---|---|
+| default (none) | 1.0000 / 0.9016 / 0.9482 | - | 0 |
+| inferred identity | 1.0000 / 0.9119 / 0.9539 | `case_21` `account_6440`, `case_25` `account_3136` | 15 |
+| scoped snapshot | 1.0000 / 0.9016 / 0.9482 | none (the only sample, `case_31`, also needs inferred identity) | 14 (identifier-linked accounts) |
+| document or OCR | 1.0000 / 0.9016 / 0.9482 | none (no sample answer cites a screenshot) | 1 (`case_45`) |
+| identity + snapshot | 1.0000 / 0.9171 / 0.9568 | the two above and `case_31` `account_4857` | 36 (15 + 14 + 7 that need both) |
+| all three | 1.0000 / 0.9171 / 0.9568 | as above | 37 |
+
+What each kind rests on, from the script's per-step listing:
+* **Inferred identity (15 eval steps):** the state is direct. An eligible lookup names the account and returns no profile (404), read 8 to 22 days after the account's deletion-worker row. The owner is inferred: no identifier can remain on a deleted profile, so the link is the unique deletion-worker row compatible with the case. 3 of the 15 (`case_190`, `case_274`, `case_427`) are unique only after another case's account is eliminated. Activity attribution made 0 wrong assignments in the hide-and-recover checks (112, 89 and 85 correct; `code/analysis/account_attribution_eval.py`). On the samples, all 12 activity-attributed accounts are right (27 of 27 assignments, counting the 15 made by identifier).
+* **Scoped snapshot (14 + 7):** absence is not observed. It is read from a bundle that lists the subject's other records but no profile. These bundles are partial: 3 of them leave out accounts that other files show present within 24 hours, although none of those accounts' owners is covered by that bundle. For all 14 identifier-linked accounts, the identifier comes only from a file captured after `audit_at`. In 13 of the 21 the workflow itself reports the account delete as FAILED or PARTIAL. As a diagnostic only (never used for a decision), 5 of the 14 accounts appear PRESENT in a file captured after the audit, and no recorded sync or restore explains it.
+* **Document or OCR (1):** `audit_record_003` in `case_45` is tied to the subject by the catalog row, the subject reference visible in the screenshot, and a compliance-journal PDF captured 30 minutes earlier naming the same record. The state rule for screenshots ("a record shown in the console exists") is not validated by any sample.
 
 ## 7. Additional evaluation cases (created for this project)
 
@@ -141,6 +159,9 @@ Six synthetic scenarios with fictional identifiers, run through the real pipelin
 | Steps | Mutation checks on `plan.py` left 4 surviving mutants (unproven requirements, de-duplication, NOT_APPLICABLE emission, counted vs all violations) | Tests with hand-built verdicts added; all 17 mutants are now caught |
 | CLI | A relative `--dataset` path failed with a raw traceback; `python -m ghostaudit` was unusable from the repository root; the root `output.csv` guard depended on the dataset location | Clear errors with a hint, `code/main.py` entry point, a guard on the real root file, parent directories created, tests from both directories |
 | Dataset loading | Predictions needlessly required `sample_output.csv` | Optional; predictions never use it |
+| Policy | `deletion_rules.csv` was loaded but never consulted: treatments came from a table in `state.py`. It agreed with the file, but a changed rule would have been ignored silently, and the README said the file drove every treatment | The table (`RULE_ACTIONS`) is compared with the file before every run. Any difference stops the run with exit code 2 and writes nothing, and the two treatments not written in the file (flows, backup restore) are documented. Predictions are byte-identical |
+| Account attribution | The result key (COMPLETE/SUCCESS, PARTIALLY_COMPLETE/PARTIAL, NOT_STARTED/FAILED) was also applied to the subject's *own* content-linked account. In sample `case_06` (a partial workflow whose account delete succeeded) that rejected the right account and left a spurious "unattributed" gap | The key now only chooses among unowned accounts. Samples: 27 accounts attributed correctly instead of 26, still 0 wrong. The 518 predictions and the 32 sample predictions are byte-identical, because all 252 content-linked eval pairs agree with the key |
+| Tests | One test asserted that the root `output.csv` does not exist, so the suite failed once the submission file had been generated | The CLI tests now check that the file's bytes are unchanged (or that it is still absent) |
 | Packaging | The archive verifier could not see backslash entry names (Python converts them when reading on Windows), and the starter's PowerShell zip command writes exactly such names | The verifier reads the original names; packaging uses `code/tools/package.py`, which writes portable names |
 | Packaging | The shipped OCR cache and several test fixtures carried dataset names, e-mails and one phone number the code does not need | An experiment on all 550 cases found the pipeline needs only 4 of 13 values in the cache; the rest were replaced (identical results), inline test fixtures now use synthetic values, and the verifier fails on dataset identifiers in any file not explicitly justified. A first experiment wrongly concluded that 3 values were enough because its placeholders had no `@`; the realistic-placeholder rerun caught it (`case_39`) |
 
@@ -150,6 +171,7 @@ From the repository root (the `dataset/` folder next to `code/`):
 
 ```text
 python code/analysis/m5_evaluation.py                          # sections 1-5 (samples scored; 518 rows validated)
+python code/analysis/proof_policy_comparison.py                # section 6, inferred-proof policies compared
 python code/evaluation/custom_cases.py                         # section 7
 python code/evaluation/main.py --pred <predictions.csv>        # local scorer on any predictions file
 python code/main.py predict --samples --out <file>             # sample predictions

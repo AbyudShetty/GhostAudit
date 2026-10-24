@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from tests.helpers import needs_dataset, real_dataset
+from tests.world import RULE_HEADER, rule_rows
 
 from ghostaudit.dataset import load_dataset
 from ghostaudit.reconstruction import CaseReconstructor
@@ -35,7 +36,7 @@ def build_dataset(root: Path):
         ["case_2", "ann@x.com", "2026-03-01T00:00:00Z", "COMPLETE", "2026-03-03T12:00:00Z", "2026-03-10T12:00:00Z", "please delete my account"]])
     write_csv(root / "sample_deletion_requests.csv", req, [])
     write_csv(root / "sample_output.csv", ["case_id", "deletion_status", "steps_json"], [])
-    write_csv(root / "deletion_rules.csv", ["rule_id", "data_category", "condition", "required_action"], [["rule_01", "USER_PROFILE", "Always", "DELETE"]])
+    write_csv(root / "deletion_rules.csv", RULE_HEADER, rule_rows())
     act = ["activity_id", "event_time", "event_type", "source_system", "target_system", "resource_id", "reported_result", "details"]
     w = lambda a, t, rid, tgt, res="SUCCESS", ev="DELETE_RECORD": [a, t, ev, "deletion_worker", tgt, rid, res, f"worker {rid}"]  # noqa: E731
     write_csv(root / "system_activity.csv", act, [

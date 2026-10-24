@@ -15,6 +15,16 @@ from ghostaudit.reconstruction import CaseReconstructor
 H = lambda e: hashlib.sha256(e.encode()).hexdigest()  # noqa: E731
 REQ, REP, AUD = "2026-08-20T00:00:00Z", "2026-08-22T12:00:00Z", "2026-09-15T12:00:00Z"
 PRE, AT, POST = "2026-09-15T11:00:00Z", AUD, "2026-09-16T11:00:00Z"
+RULE_HEADER = ["rule_id", "data_category", "condition", "required_action"]
+
+
+def rule_rows():
+    """A deletion_rules.csv that agrees with the program (every synthetic dataset needs one; see state.check_rules)."""
+    from ghostaudit.state import RULE_ACTIONS
+
+    return [[f"rule_{i:02d}", c, "Always", a] for i, (c, a) in enumerate(RULE_ACTIONS.items(), start=1)]
+
+
 ACT_HEADER = ["activity_id", "event_time", "event_type", "source_system", "target_system", "resource_id", "reported_result", "details"]
 
 
@@ -79,7 +89,7 @@ class World:
         w("deletion_requests.csv", hdr, self.cases)
         w("sample_deletion_requests.csv", hdr, [])
         w("sample_output.csv", ["case_id", "deletion_status", "steps_json"], [])
-        w("deletion_rules.csv", ["rule_id", "data_category", "condition", "required_action"], [["rule_01", "USER_PROFILE", "Always", "DELETE"]])
+        w("deletion_rules.csv", RULE_HEADER, rule_rows())
         w("system_activity.csv", ACT_HEADER, self.acts)
         w("evidence_files.csv", ["file_id", "file_path", "origin", "captured_at"], [[f, p, "o", c] for f, (p, c, _) in self.files.items()])
         for f, (p, c, body) in self.files.items():

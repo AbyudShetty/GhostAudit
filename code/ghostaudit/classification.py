@@ -98,6 +98,9 @@ class Requirement:
     reason: str
     candidates: Tuple[str, ...] = ()
     kind: str = DIRECT  # what the proof rests on: direct | inferred_identity | scoped_snapshot | document_or_ocr | set_wise
+    # every non-direct element of the proof (a scoped-snapshot proof of an activity-attributed account has two); empty = direct.
+    # A COMPLETE step is emitted only when the plan policy allows each one (ghostaudit/plan.py).
+    inferences: Tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -157,6 +160,11 @@ def _kind(conf_cap: str, evs: Sequence[StateEvidence]) -> str:
     return DOCUMENT_OR_OCR if evs and _best(evs) != HIGH else DIRECT
 
 
+def _inferences(conf_cap: str, evs: Sequence[StateEvidence]) -> Tuple[str, ...]:
+    """What a resource proof infers: the owner (activity-attributed account) and/or the state (PDF text or screenshot OCR)."""
+    return tuple(k for k, on in ((INFERRED_IDENTITY, conf_cap != HIGH), (DOCUMENT_OR_OCR, bool(evs) and _best(evs) != HIGH)) if on)
+
+
 def _ids(d: ResourceDecision) -> Tuple[str, ...]:
     return d.state.citable
 
@@ -209,7 +217,7 @@ class _Builder:
                 return
             key = "RETAINED_PRESENT" if a.verdict == "RETAINED_OK" else ("ACCOUNT_ABSENT" if d.state.category == "USER_PROFILE" else "RESOURCE_TREATED")
             self.requirements.append(Requirement(key, rid, d.state.category, VERIFY_FOR_ACTION.get(a.required_action, ""), "PROVEN", conf, _ids(d), d.state.basis, a.reason,
-                                                 kind=_kind(account_conf_cap, evs)))
+                                                 kind=_kind(account_conf_cap, evs), inferences=_inferences(account_conf_cap, evs)))
         elif a.verdict == "RETAINED_MISSING":
             if _retention_expired(d, self.r.audit_at):
                 return
@@ -222,7 +230,8 @@ class _Builder:
             self.requirements.append(Requirement("RETAINED_PRESENT" if a.required_action == "RETAIN" else
                                                  ("ACCOUNT_ABSENT" if d.state.category == "USER_PROFILE" else "RESOURCE_TREATED"),
                                                  rid, d.state.category, VERIFY_FOR_ACTION.get(a.required_action, ""), "UNPROVEN", LOW, (), d.state.basis, why,
-                                                 kind=INFERRED_IDENTITY if account_conf_cap != HIGH else DIRECT))
+                                                 kind=INFERRED_IDENTITY if account_conf_cap != HIGH else DIRECT,
+                                                 inferences=(INFERRED_IDENTITY,) if account_conf_cap != HIGH else ()))
 
     @staticmethod
     def _caveats(d: ResourceDecision) -> List[str]:
@@ -245,14 +254,14 @@ class _Builder:
         post = "; identified only by evidence captured after audit_at" if d.association is not None and d.association.post_audit_only else ""
         return "no evidence usable at audit_at" + later + post
 
-    def _scoped_requirement(self, resource_id: Optional[str], candidates: Tuple[str, ...] = ()) -> bool:
+    def _scoped_requirement(self, resource_id: Optional[str], candidates: Tuple[str, ...] = (), identity_inferred: bool = False) -> bool:
         """Support 'no account profile for the subject' by a subject-scoped snapshot, if the policy allows and one exists."""
         if not (self.policy.accept_scoped_snapshot_absence and self.scoped):
             return False
         sc = self.scoped
         self.requirements.append(Requirement("ACCOUNT_ABSENT", resource_id, "USER_PROFILE", "VERIFY_RECORD_ABSENT", "PROVEN", MEDIUM, (sc.file_id,), "scoped_snapshot",
                                              "no explicit record names the account; " + sc.describe(), candidates,
-                                             kind=SCOPED_SNAPSHOT))
+                                             kind=SCOPED_SNAPSHOT, inferences=(SCOPED_SNAPSHOT,) + ((INFERRED_IDENTITY,) if identity_inferred else ())))
         return True
 
     # ---- the account ---------------------------------------------------------------------------------------
@@ -266,7 +275,7 @@ class _Builder:
                 self.gaps.append(Gap("ACCOUNT_INFERRED", att.account, f"{att.account} is attributed from activity only; the policy does not accept that as proof"))
                 self.requirements.append(Requirement("ACCOUNT_ABSENT", att.account, "USER_PROFILE", "VERIFY_RECORD_ABSENT", "UNPROVEN", LOW, (), "activity", "attribution not accepted"))
             elif d is not None and d.included:
-                if d.state.state == "UNKNOWN" and d.relevance.label == RELEVANT and (d.association is None or d.association.status == "ASSOCIATED")                         and self._scoped_requirement(att.account):
+                if d.state.state == "UNKNOWN" and d.relevance.label == RELEVANT and (d.association is None or d.association.status == "ASSOCIATED")                         and self._scoped_requirement(att.account, identity_inferred=att.status == STRONG):
                     self.gaps.append(Gap("ACCOUNT_STATE_NOT_EXPLICIT", att.account, f"{att.account}: no record names it at audit_at; absence rests on a subject-scoped snapshot", False))
                 else:
                     self.resource(d, cap)

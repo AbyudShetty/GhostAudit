@@ -310,13 +310,41 @@ class Assessment:
     reason: str
 
 
-_REQUIRED = {
+# deletion_rules.csv as this program applies it: category -> required_action. The rules' conditions are prose, so each one is implemented
+# in code (retention_until for audit records, legal-hold retention, single-owner attachments, tombstone identifier fields); the category ->
+# action pairing is what can be checked mechanically, and check_rules compares it with the supplied file before every run.
+RULE_ACTIONS = {
     "USER_PROFILE": "DELETE", "SECONDARY_IDENTIFIER": "DELETE", "SEARCH_INDEX_ENTRY": "DELETE", "CACHE_ENTRY": "DELETE",
-    "SUPPORT_MESSAGE": "REDACT", "SUPPORT_ATTACHMENT": "DELETE", "SUPPORT_RECORD": "DELETE", "ANALYTICS_PROFILE": "ANONYMIZE",
-    "PRODUCT_TELEMETRY": "ANONYMIZE", "USER_EXPORT": "DELETE", "MARKETING_PROFILE": "DELETE", "EMAIL_DELIVERY_LOG": "REDACT",
-    "SECURITY_AUDIT_LOG": "RETAIN", "LEGAL_HOLD_RECORD": "RETAIN", "ACCOUNT_TOMBSTONE": "REDACT", "DATA_FLOW": "DISABLE",
-    "BACKUP_ARCHIVE": "BLOCK_RESTORE",
+    "SUPPORT_MESSAGE": "REDACT", "SUPPORT_ATTACHMENT": "DELETE", "ANALYTICS_PROFILE": "ANONYMIZE", "PRODUCT_TELEMETRY": "ANONYMIZE",
+    "USER_EXPORT": "DELETE", "MARKETING_PROFILE": "DELETE", "EMAIL_DELIVERY_LOG": "REDACT", "SECURITY_AUDIT_LOG": "RETAIN",
+    "LEGAL_HOLD_RECORD": "RETAIN", "BACKUP_ARCHIVE": "RETAIN", "ACCOUNT_TOMBSTONE": "REDACT",
 }
+_REQUIRED = {
+    **RULE_ACTIONS,
+    "BACKUP_ARCHIVE": "BLOCK_RESTORE",  # rule_14: the archive is retained "if restore access can be blocked", so what must hold is a blocked restore
+    "DATA_FLOW": "DISABLE",  # no rule names flows; AGENTS.md 6.5: COMPLETE needs "no active sync, import, or restore path"
+    "SUPPORT_RECORD": "DELETE",  # a support item of unspecified type (see assess)
+}
+
+
+class RulesMismatch(ValueError):
+    """deletion_rules.csv does not say what this program applies; running anyway would silently ignore the supplied policy."""
+
+
+def check_rules(rules: Sequence[Any]) -> List[str]:
+    """Differences between the supplied rules (``dataset.Rule`` rows) and ``RULE_ACTIONS``; empty when they agree exactly."""
+    problems: List[str] = []
+    given: Dict[str, str] = {}
+    for r in rules:
+        want = RULE_ACTIONS.get(r.data_category)
+        if want is None:
+            problems.append(f"{r.rule_id}: category {r.data_category} has no implemented treatment")
+        elif r.required_action != want:
+            problems.append(f"{r.rule_id}: {r.data_category} requires {r.required_action}, but this program applies {want}")
+        if given.setdefault(r.data_category, r.required_action) != r.required_action:
+            problems.append(f"{r.rule_id}: {r.data_category} is given two different actions")
+    problems += [f"no rule for {c}, which this program treats as {a}" for c, a in RULE_ACTIONS.items() if c not in given]
+    return problems
 
 
 def assess(category: str, state: str) -> Assessment:

@@ -45,6 +45,18 @@ class Strong(unittest.TestCase):
         r = a.attribute([C1])["case_1"]
         self.assertEqual((r.status, r.confidence, r.account), (CONTENT, HIGH, "account_10"))
 
+    def test_own_content_linked_account_is_not_rejected_by_the_result_key(self):
+        # a PARTIALLY_COMPLETE workflow whose account delete succeeded: the identifier already says whose account it is
+        c = (mk_case("case_1", "u1@x.com", status="PARTIALLY_COMPLETE"), "user_1")
+        r = attributor([acct("a1", "account_10", 60, result="SUCCESS")], owned=[("account_10", "user_1")]).attribute([c])["case_1"]
+        self.assertEqual((r.status, r.account, r.rejected), (CONTENT, "account_10", ()))
+
+    def test_the_result_key_still_filters_unowned_candidates(self):
+        c = (mk_case("case_1", "u1@x.com", status="PARTIALLY_COMPLETE"), "user_1")
+        r = attributor([acct("a1", "account_10", 60, result="SUCCESS")]).attribute([c])["case_1"]
+        self.assertEqual((r.status, r.account), (NONE, None))
+        self.assertEqual(r.rejected, (("account_10", "result SUCCESS incompatible with reported_status PARTIALLY_COMPLETE"),))
+
     def test_unique_unowned_candidate_is_strong_medium(self):
         r = attributor([acct("a1", "account_10", 60)]).attribute([C1])["case_1"]
         self.assertEqual((r.status, r.confidence, r.account), (STRONG, MEDIUM, "account_10"))
@@ -174,7 +186,7 @@ class RealDataSafety(unittest.TestCase):
         gold = {r["case_id"]: next(s["resource_id"] for s in json.loads(r["steps_json"]) if s["resource_id"].startswith("account_")) for r in cr.ds.sample_output}
         wrong = [(c, r.account, gold[c]) for c, r in base.items() if c in gold and r.account and r.account != gold[c]]
         self.assertEqual(wrong, [])
-        self.assertEqual(sum(1 for c, r in base.items() if c in gold and r.account == gold[c]), 26)  # measured; not a requirement
+        self.assertEqual(sum(1 for c, r in base.items() if c in gold and r.account == gold[c]), 27)  # measured; not a requirement (26 before case_06's own account stopped being rejected by the result key)
         truth = {c: r.account for c, r in base.items() if r.status == CONTENT and c not in gold}
         ids = sorted(truth, key=lambda c: int(c.split("_")[1]))
         hidden = ids[::2]

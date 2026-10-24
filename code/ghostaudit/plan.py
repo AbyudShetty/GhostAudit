@@ -16,10 +16,12 @@ INCOMPLETE      findings (cited) for every counted violation; one remediation st
                 already-compliant resources that need no remediation is NOT added: the specification asks verification to
                 cover "each remediated record or process" and no sample answer contains such an item.
 COMPLETE        verification steps only, each citing one usable evidence id. A requirement becomes a step only if it is
-                PROVEN, names a resource, has usable evidence, and is *direct proof*. Proofs that rest on an inferred
-                account identity (activity attribution), a subject-scoped snapshot, or document/OCR text are withheld by
-                default (``PlanPolicy.emit_inferred_proofs``): an inferred identity must not become proof that a resource is
-                absent. Set-wise proofs name no resource and can never become a step. A COMPLETE case with
+                PROVEN, names a resource, has usable evidence, and is *direct proof*. A proof can rest on up to three kinds
+                of inference (``Requirement.inferences``): an account identity attributed from activity, absence read from a
+                subject-scoped snapshot, or state read from document/OCR text. Each kind has its own switch in ``PlanPolicy``,
+                all off by default, and a proof is emitted only when *every* inference it rests on is allowed: a scoped-snapshot
+                proof for an activity-attributed account needs both switches, so a direct state reading never stands in for an
+                uncertain owner. Set-wise proofs name no resource and can never become a step. A COMPLETE case with
                 ``determination=PARTIAL`` therefore carries only the steps that are genuinely proven (possibly none).
 Unresolved accounts are never named. Ordering is canonical (``schema.step_sort_key``: phase, operation table order,
 ``system_id``, ``resource_id``), which also satisfies "disable flows and block restores before changing records".
@@ -35,7 +37,8 @@ import json
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-from .classification import (COMPLETE, DIRECT, INCOMPLETE, INFERRED_IDENTITY, NOT_APPLICABLE, CaseVerdict, Requirement, Violation)
+from .classification import (COMPLETE, DIRECT, DOCUMENT_OR_OCR, INCOMPLETE, INFERRED_IDENTITY, NOT_APPLICABLE, SCOPED_SNAPSHOT, CaseVerdict, Requirement,
+                             Violation)
 from .dataset import EvidenceFile
 from .schema import (OPERATION_STATE, OUTPUT_COLUMNS, REMEDIATE_FOR_ACTION, VERIFY_FOR_ACTION, case_sort_key, step_sort_key, system_for_resource)
 from .timeutil import parse_ts
@@ -43,8 +46,22 @@ from .timeutil import parse_ts
 
 @dataclass(frozen=True)
 class PlanPolicy:
-    emit_inferred_proofs: bool = False  # COMPLETE: also emit proofs that rest on inferred identity / scoped snapshot / document-or-OCR text
+    # COMPLETE proofs that rest on an inference; each switch allows one kind, and a proof needs all of its kinds allowed
+    emit_inferred_identity_proofs: bool = False  # the account is the subject's only by deletion-worker activity (unique attribution)
+    emit_scoped_snapshot_proofs: bool = False  # "no profile" read from a snapshot that lists the subject's other records but not a profile
+    emit_document_or_ocr_proofs: bool = False  # the state is read from PDF text or screenshot OCR
     include_inferred_account_checks: bool = True  # INCOMPLETE: future "account absent" check for an activity-attributed account
+
+    @classmethod
+    def all_inferred(cls, **kw) -> "PlanPolicy":
+        """Every inferred proof allowed (the ``--emit-inferred-proofs`` ablation)."""
+        return cls(emit_inferred_identity_proofs=True, emit_scoped_snapshot_proofs=True, emit_document_or_ocr_proofs=True, **kw)
+
+    def blocked(self, inferences: Iterable[str]) -> Tuple[str, ...]:
+        """The inferences in ``inferences`` that this policy does not allow (empty: the proof may become a step)."""
+        allowed = {INFERRED_IDENTITY: self.emit_inferred_identity_proofs, SCOPED_SNAPSHOT: self.emit_scoped_snapshot_proofs,
+                   DOCUMENT_OR_OCR: self.emit_document_or_ocr_proofs}
+        return tuple(k for k in inferences if not allowed.get(k, False))
 
 
 @dataclass(frozen=True)
@@ -136,7 +153,7 @@ def _incomplete(v: CaseVerdict, manifest, policy: PlanPolicy, raw: List[Dict[str
         if not r.resource_id or r.resource_id in remediated or r.key == "RETAINED_EXPIRED":
             continue
         if r.key == "ACCOUNT_ABSENT":
-            if r.kind == INFERRED_IDENTITY and not policy.include_inferred_account_checks:
+            if INFERRED_IDENTITY in (r.inferences or (r.kind,)) and not policy.include_inferred_account_checks:
                 withheld.append(Withheld("VERIFICATION", r.resource_id, r.expected_op, "account identity is inferred from activity and the policy excludes such checks"))
                 continue
             raw.append(_step("VERIFICATION", r.resource_id, "VERIFY_RECORD_ABSENT", ""))
@@ -163,8 +180,9 @@ def _complete(v: CaseVerdict, manifest, policy: PlanPolicy, raw: List[Dict[str, 
         if not cite:
             withheld.append(Withheld("VERIFICATION", r.resource_id, r.expected_op, "no usable evidence id to cite"))
             continue
-        if r.kind != DIRECT and not policy.emit_inferred_proofs:
-            withheld.append(Withheld("VERIFICATION", r.resource_id, r.expected_op, f"proof rests on {r.kind}, not direct evidence", r.evidence_ids))
+        blocked = policy.blocked(r.inferences or ((r.kind,) if r.kind != DIRECT else ()))  # fail closed if only ``kind`` says it is indirect
+        if blocked:
+            withheld.append(Withheld("VERIFICATION", r.resource_id, r.expected_op, f"proof rests on {'+'.join(blocked)}, not direct evidence", r.evidence_ids))
             continue
         raw.append(_step("VERIFICATION", r.resource_id, r.expected_op, cite))
     _note_unresolved_accounts(v, withheld)

@@ -48,17 +48,19 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap = argparse.ArgumentParser(prog="ghostaudit")
     ap.add_argument("--dataset", type=Path, default=default_dataset_dir(), help="path to the dataset/ directory (read-only)")
     sub = ap.add_subparsers(dest="cmd", required=False)
-    ap.set_defaults(cmd="submit", out=None, samples=False, emit_inferred_proofs=False)  # a bare invocation produces the submission file
+    ap.set_defaults(cmd="submit", out=None, samples=False, emit_inferred_proofs=False, emit=[])  # a bare invocation produces the submission file
     p_inv = sub.add_parser("inventory", help="parse every evidence file and report counts/failures")
     p_inv.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     sub.add_parser("validate-samples", help="validate sample_output.csv against the output contract")
     p_sub = sub.add_parser("submit", help="classify every request in deletion_requests.csv and write <root>/output.csv (or --out)")
     p_sub.add_argument("--out", type=Path, default=None, help="default: output.csv in the directory that contains code/")
-    p_sub.add_argument("--emit-inferred-proofs", action="store_true", help="also emit COMPLETE proofs that rest on inferred identity / scoped snapshot / OCR text")
-    p_pred = sub.add_parser("predict", help="classify every request in deletion_requests.csv and write a prediction CSV (never the repository-root output.csv yet)")
-    p_pred.add_argument("--out", type=Path, required=True, help="where to write the CSV; the repository-root output.csv is refused until the packaging milestone")
+    p_pred = sub.add_parser("predict", help="classify every request in deletion_requests.csv and write a prediction CSV anywhere except the repository-root output.csv")
+    p_pred.add_argument("--out", type=Path, required=True, help="where to write the CSV; the repository-root output.csv is refused (use submit for it)")
     p_pred.add_argument("--samples", action="store_true", help="predict the 32 sample requests instead of the 518 evaluation requests")
-    p_pred.add_argument("--emit-inferred-proofs", action="store_true", help="also emit COMPLETE proofs that rest on inferred identity / scoped snapshot / OCR text")
+    for p in (p_sub, p_pred):
+        p.add_argument("--emit-proofs", dest="emit", action="append", choices=EMIT_CHOICES, default=[],
+                       help="also emit COMPLETE proofs that rest on this kind of inference (repeatable; all off by default). A proof that rests on two kinds needs both")
+        p.add_argument("--emit-inferred-proofs", action="store_true", help="shorthand for every --emit-proofs kind")
     args = ap.parse_args(argv)
 
     try:
@@ -87,21 +89,40 @@ def main(argv: Optional[List[str]] = None) -> int:
             print(v)
         print(f"{len(rows)} sample rows, {len(viol)} violations")
         return 0 if not viol else 1
-    if args.cmd == "predict":
-        return _predict(ds, args)
-    if args.cmd == "submit":
-        return _submit(ds, args)
+    from .state import RulesMismatch
+
+    try:
+        if args.cmd == "predict":
+            return _predict(ds, args)
+        if args.cmd == "submit":
+            return _submit(ds, args)
+    except RulesMismatch as e:  # nothing has been written yet
+        print(f"error: {e}", file=sys.stderr)
+        return 2
     return 2
 
 
-def _pipeline(ds, cases, emit_inferred: bool):
+EMIT_CHOICES = ("inferred-identity", "scoped-snapshot", "document-or-ocr")
+
+
+def plan_policy(emit, emit_all: bool = False):
+    """The PlanPolicy defaults plus the --emit-proofs choices (or every kind with --emit-inferred-proofs). The defaults live in PlanPolicy only."""
+    from .plan import PlanPolicy
+
+    on, d = (set(EMIT_CHOICES) if emit_all else set(emit)), PlanPolicy()
+    return PlanPolicy(emit_inferred_identity_proofs=d.emit_inferred_identity_proofs or "inferred-identity" in on,
+                      emit_scoped_snapshot_proofs=d.emit_scoped_snapshot_proofs or "scoped-snapshot" in on,
+                      emit_document_or_ocr_proofs=d.emit_document_or_ocr_proofs or "document-or-ocr" in on)
+
+
+def _pipeline(ds, cases, policy):
     """Classify and plan every case; returns (rows, plans, ids, violations). Pure: writes nothing."""
     from .classification import classify_all
-    from .plan import PlanPolicy, plan_all, rows_for
+    from .plan import plan_all, rows_for
     from .reconstruction import CaseReconstructor
 
     cr = CaseReconstructor(ds)
-    plans = plan_all(classify_all(cr, cases), cr.manifest, PlanPolicy(emit_inferred_proofs=emit_inferred))
+    plans = plan_all(classify_all(cr, cases), cr.manifest, policy)
     ids = [c.case_id for c in cases]
     rows = rows_for(plans, ids)
     ev = [f.file_id for f in ds.evidence_files.rows] + [a.activity_id for a in ds.activity.rows] + [a.audit_id for a in ds.audit_log.rows]
@@ -128,7 +149,7 @@ def _predict(ds, args) -> int:
         print("refusing to write the root output.csv with 'predict': use 'submit' for the submission file", file=sys.stderr)
         return 2
     cases = ds.sample_requests.rows if args.samples else ds.requests.rows
-    rows, plans, ids, viol = _pipeline(ds, cases, args.emit_inferred_proofs)
+    rows, plans, ids, viol = _pipeline(ds, cases, plan_policy(args.emit, args.emit_inferred_proofs))
     for v in viol:
         print(v, file=sys.stderr)
     if viol:
@@ -142,7 +163,7 @@ def _submit(ds, args) -> int:
     if out.parent == args.dataset.resolve() or args.dataset.resolve() in out.parents:
         print("refusing to write inside the dataset directory", file=sys.stderr)
         return 2
-    rows, plans, ids, viol = _pipeline(ds, ds.requests.rows, args.emit_inferred_proofs)
+    rows, plans, ids, viol = _pipeline(ds, ds.requests.rows, plan_policy(args.emit, args.emit_inferred_proofs))
     for v in viol:
         print(v, file=sys.stderr)
     if viol:

@@ -112,6 +112,12 @@ class FromBothDirectories(unittest.TestCase):
             self.assertEqual(a.read_bytes(), b.read_bytes())
 
 
+def root_output_bytes():
+    """Content of the repository-root output.csv, or None when it does not exist (it may exist: the user generates it)."""
+    f = REPO / "output.csv"
+    return f.read_bytes() if f.exists() else None
+
+
 def copy_package(dest: Path) -> Path:
     """A throw-away 'extracted package': <dest>/code with the sources and no dataset, so its root is <dest>."""
     shutil.copytree(CODE_DIR, dest / "code", ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "tests", "analysis", "docs"))
@@ -123,7 +129,7 @@ class Submit(unittest.TestCase):
     """'submit' writes <root>/output.csv for the tree it runs from, so these run in a copy and never touch the repository root."""
 
     def test_bare_invocation_and_submit_write_the_same_valid_518_row_file_at_their_own_root(self):
-        before = (REPO / "output.csv").exists()
+        before = root_output_bytes()
         with tempfile.TemporaryDirectory() as d:
             root = copy_package(Path(d))
             r = run(root, "code/main.py", "--dataset", str(DATASET))
@@ -141,7 +147,26 @@ class Submit(unittest.TestCase):
             r2 = run(root, "code/main.py", "--dataset", str(DATASET), "submit", "--out", str(elsewhere))
             self.assertEqual(r2.returncode, 0, r2.stderr)
             self.assertEqual(out.read_bytes(), elsewhere.read_bytes())
-        self.assertEqual((REPO / "output.csv").exists(), before)
+        self.assertEqual(root_output_bytes(), before)  # the real submission file is neither created nor changed
+
+    def test_a_rules_file_that_disagrees_stops_the_run_before_anything_is_written(self):
+        with tempfile.TemporaryDirectory() as d:
+            copy = Path(d) / "dataset"
+            copy.mkdir()
+            for n in REQUIRED_FILES:
+                shutil.copy(DATASET / n, copy / n)
+            rules = (copy / "deletion_rules.csv").read_text(encoding="utf-8")
+            self.assertIn("rule_07,ANALYTICS_PROFILE,Record is still attributable to a user,ANONYMIZE", rules)
+            (copy / "deletion_rules.csv").write_text(rules.replace("attributable to a user,ANONYMIZE", "attributable to a user,DELETE", 1), encoding="utf-8")
+            out = Path(d) / "out" / "pred.csv"
+            before = root_output_bytes()
+            for cmd in (["predict", "--out", str(out)], ["submit", "--out", str(out)]):
+                r = run(REPO, "code/main.py", "--dataset", str(copy), *cmd)
+                self.assertEqual(r.returncode, 2, r.stderr)
+                self.assertIn("rule_07: ANALYTICS_PROFILE requires DELETE, but this program applies ANONYMIZE", r.stderr)
+                self.assertNotIn("Traceback", r.stderr)
+                self.assertFalse(out.exists())
+            self.assertEqual(root_output_bytes(), before)
 
     def test_submit_refuses_to_write_inside_the_dataset_directory(self):
         with tempfile.TemporaryDirectory() as d:
@@ -167,7 +192,7 @@ class Submit(unittest.TestCase):
 @needs_dataset
 class RootOutputGuard(unittest.TestCase):
     def test_refused_from_either_directory_and_with_a_dataset_copy_elsewhere(self):
-        before = (REPO / "output.csv").exists()
+        before = root_output_bytes()
         for cwd, target in ((REPO, "output.csv"), (CODE_DIR, "../output.csv"), (REPO, str(REPO / "OUTPUT.CSV" if os.name == "nt" else REPO / "output.csv"))):
             r = run(cwd, "-m" if cwd == CODE_DIR else str(CODE_DIR / "main.py"), *(["ghostaudit"] if cwd == CODE_DIR else []), "predict", "--out", target)
             self.assertEqual(r.returncode, 2, (cwd, target, r.stderr))
@@ -184,7 +209,7 @@ class RootOutputGuard(unittest.TestCase):
             r = run(REPO, "code/main.py", "--dataset", str(copy), "predict", "--out", str(sibling))
             self.assertEqual(r.returncode, 2)
             self.assertFalse(sibling.exists())
-        self.assertEqual((REPO / "output.csv").exists(), before)
+        self.assertEqual(root_output_bytes(), before)  # the real submission file is neither created nor changed
 
 
 if __name__ == "__main__":

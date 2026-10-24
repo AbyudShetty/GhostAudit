@@ -1,5 +1,3 @@
-log.txt
-
 # generated caches and scratch files (added in M3; the OCR cache code/ghostaudit/data/screenshot_ocr.json is intentionally NOT ignored)
 __pycache__/
 *.py[cod]

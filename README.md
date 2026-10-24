@@ -40,9 +40,10 @@ Other commands (all work from the repository root or from `code/`; a relative `-
 | `python code/main.py validate-samples` | validate the supplied sample answers against the output contract |
 | `python code/main.py inventory [--json]` | parse every evidence file and report counts and failures |
 | `python code/main.py --dataset PATH ...` | use a dataset in another location (read-only) |
-| `python code/main.py ... --emit-inferred-proofs` | also emit COMPLETE proofs that rest on inferred identity (off by default, see section 6) |
+| `python code/main.py ... --emit-proofs KIND` | also emit COMPLETE proofs that rest on one kind of inference: `inferred-identity`, `scoped-snapshot` or `document-or-ocr` (repeatable; all off by default, see section 6) |
+| `python code/main.py ... --emit-inferred-proofs` | shorthand for all three `--emit-proofs` kinds |
 
-A wrong dataset path stops with a clear message and exit code 2 (it never writes anything).
+A wrong dataset path, or a `deletion_rules.csv` that differs from the treatments the program applies, stops with a clear message and exit code 2 (nothing is written).
 
 ## 3. Output contract (summary of `problem_statement.md`)
 
@@ -85,11 +86,12 @@ Each stage is a separate module in `code/ghostaudit/`, so a claim can be traced 
 ## 6. Decisions you should know about
 
 * **A step is emitted only if the evidence supports it.** Findings cite a `file_id`/`activity_id`/`audit_id` captured at or before `audit_at`. COMPLETE verification steps cite the evidence of the compliant state. Remediation and INCOMPLETE verification steps carry an empty `evidence_id`.
-* **Inferred identity is not proof.** An account known only from deletion-worker activity, a subject-scoped snapshot, or document/OCR text can support a COMPLETE status but does not produce a verification step by default. Unresolved accounts get no step; they are never guessed.
+* **Inferred identity is not proof.** A COMPLETE proof can rest on three kinds of inference: an account known only from deletion-worker activity, absence read from a subject-scoped snapshot, or state read from document/OCR text. Each can support a COMPLETE status, but none produces a verification step by default. Each kind has its own switch (`--emit-proofs`). A proof that rests on two kinds, such as snapshot absence of an activity-attributed account, needs both switches, so a direct state reading never stands in for an uncertain owner. Unresolved accounts get no step; they are never guessed. The comparison of these policies is in section 6 of the evaluation report (`code/analysis/proof_policy_comparison.py`).
 * **Uncertain evidence cannot establish a violation.** Screenshots tied to a case only by capture time, or conflicting with other evidence, are ignored; screenshot and PDF readings that are grounded in the catalog are usable (MEDIUM confidence).
 * **A case with nothing directly provable is still COMPLETE if nothing contradicts completeness**, with `determination=PARTIAL` and possibly an empty `steps_json` (three evaluation cases). This is a labelling policy (`ClassificationPolicy.unproven_status`), not proof of completion.
 * Switches and their measured effects are listed in section 6 of the evaluation report.
-* `deletion_rules.csv`, not hard-coded labels, drives every treatment. No organizer-only file and no sample answer is read by the prediction code.
+* **Treatments come from `deletion_rules.csv`, checked at every run.** The rules' conditions are prose, so each rule is implemented in `code/ghostaudit/state.py` (`RULE_ACTIONS`). Before anything is predicted, the program compares the file's category and action pairs with what it applies. If they differ it stops with exit code 2 rather than silently ignore a changed policy. Two treatments are not spelled out in the file: data flows must be disabled (AGENTS.md 6.5), and a backup archive, which `rule_14` retains when restore access can be blocked, is checked for a blocked restore.
+* No organizer-only file and no sample answer is read by the prediction code.
 
 ## 7. Package `code.zip`
 

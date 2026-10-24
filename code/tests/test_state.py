@@ -259,5 +259,46 @@ class RealData(unittest.TestCase):
         self.assertEqual((a.state, a.assessment.verdict, b.state, b.assessment.verdict), (DEIDENTIFIED, "COMPLIANT", IDENTIFIABLE, "VIOLATION"))
 
 
+class SuppliedRules(unittest.TestCase):
+    """deletion_rules.csv must say what the program applies (state.check_rules); a difference stops the run instead of being ignored."""
+
+    # typed from dataset/deletion_rules.csv (category, required_action), independently of state.RULE_ACTIONS
+    SUPPLIED = [("rule_01", "USER_PROFILE", "DELETE"), ("rule_02", "SECONDARY_IDENTIFIER", "DELETE"), ("rule_03", "SEARCH_INDEX_ENTRY", "DELETE"),
+                ("rule_04", "CACHE_ENTRY", "DELETE"), ("rule_05", "SUPPORT_MESSAGE", "REDACT"), ("rule_06", "SUPPORT_ATTACHMENT", "DELETE"),
+                ("rule_07", "ANALYTICS_PROFILE", "ANONYMIZE"), ("rule_08", "PRODUCT_TELEMETRY", "ANONYMIZE"), ("rule_09", "USER_EXPORT", "DELETE"),
+                ("rule_10", "MARKETING_PROFILE", "DELETE"), ("rule_11", "EMAIL_DELIVERY_LOG", "REDACT"), ("rule_12", "SECURITY_AUDIT_LOG", "RETAIN"),
+                ("rule_13", "LEGAL_HOLD_RECORD", "RETAIN"), ("rule_14", "BACKUP_ARCHIVE", "RETAIN"), ("rule_15", "ACCOUNT_TOMBSTONE", "REDACT")]
+
+    @staticmethod
+    def rules(rows):
+        from ghostaudit.dataset import Rule
+        return [Rule(i, c, "cond", a) for i, c, a in rows]
+
+    def test_the_supplied_rules_agree_with_the_program(self):
+        from ghostaudit.state import check_rules
+        self.assertEqual(check_rules(self.rules(self.SUPPLIED)), [])
+
+    @needs_dataset
+    def test_the_real_file_agrees(self):
+        from ghostaudit.state import check_rules
+        self.assertEqual(check_rules(real_dataset().rules.rows), [])
+        self.assertEqual([(r.rule_id, r.data_category, r.required_action) for r in real_dataset().rules.rows], self.SUPPLIED)
+
+    def test_every_kind_of_difference_is_reported(self):
+        from ghostaudit.state import check_rules
+        changed = [r if r[1] != "ANALYTICS_PROFILE" else ("rule_07", "ANALYTICS_PROFILE", "DELETE") for r in self.SUPPLIED]
+        self.assertEqual(check_rules(self.rules(changed)), ["rule_07: ANALYTICS_PROFILE requires DELETE, but this program applies ANONYMIZE"])
+        self.assertEqual(check_rules(self.rules(self.SUPPLIED + [("rule_16", "LOYALTY_POINTS", "DELETE")])), ["rule_16: category LOYALTY_POINTS has no implemented treatment"])
+        self.assertEqual(check_rules(self.rules([r for r in self.SUPPLIED if r[1] != "CACHE_ENTRY"])), ["no rule for CACHE_ENTRY, which this program treats as DELETE"])
+        twice = check_rules(self.rules(self.SUPPLIED + [("rule_16", "CACHE_ENTRY", "RETAIN")]))
+        self.assertEqual(twice, ["rule_16: CACHE_ENTRY requires RETAIN, but this program applies DELETE", "rule_16: CACHE_ENTRY is given two different actions"])
+
+    def test_the_treatments_that_differ_from_a_rule_word_are_explicit(self):
+        # rule_14 keeps archives (RETAIN) on condition that restore can be blocked; flows have no rule but must be disabled
+        self.assertEqual(assess("BACKUP_ARCHIVE", RESTORE_ALLOWED).finding_op, "REPORT_RESTORE_RISK")
+        self.assertEqual(assess("BACKUP_ARCHIVE", RESTORE_BLOCKED).verdict, "COMPLIANT")
+        self.assertEqual(assess("DATA_FLOW", ACTIVE).finding_op, "REPORT_ACTIVE_DATA_FLOW")
+
+
 if __name__ == "__main__":
     unittest.main()

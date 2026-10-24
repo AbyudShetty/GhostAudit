@@ -168,7 +168,7 @@ class InferredEvidenceIsNotDirectProof(unittest.TestCase):
 
     def test_the_switch_emits_it_with_the_same_citation(self):
         w = self.strong_world()
-        p = plan_for(w, ppol=PlanPolicy(emit_inferred_proofs=True))
+        p = plan_for(w, ppol=PlanPolicy.all_inferred())
         self.assertIn(("VER", "VERIFY_RECORD_ABSENT", "account_10", "evidence_1"), ops(p))
         w.close()
 
@@ -192,6 +192,156 @@ class InferredEvidenceIsNotDirectProof(unittest.TestCase):
         self.assertNotIn("account_10", {s["resource_id"] for s in p2.steps})
         self.assertTrue(any(x.resource_id == "account_10" for x in p2.withheld))
         w.close()
+
+
+ID, SCOPED, OCR = "inferred-identity", "scoped-snapshot", "document-or-ocr"
+
+
+def policy(*on):
+    """PlanPolicy with exactly the named inference kinds allowed (the CLI's --emit-proofs names), independent of the defaults."""
+    return PlanPolicy(emit_inferred_identity_proofs=ID in on, emit_scoped_snapshot_proofs=SCOPED in on, emit_document_or_ocr_proofs=OCR in on)
+
+
+def snapshot(captured, subject="user_1"):
+    """A bundle that declares an (empty) account-profile collection and lists one audit record of ``subject``."""
+    audit = [{"resource_id": "audit_record_1", "subject_reference": subject, "event_name": "account_deletion_reviewed"}]
+    return {"exported_at": captured, "snapshots": [
+        {"captured_at": captured, "data_store": "account_service", "collection": "customer_profiles", "records": []},
+        {"captured_at": captured, "data_store": "security_service", "collection": "security_audit_events", "records": audit}]}
+
+
+class ProofPolicyPerKind(unittest.TestCase):
+    """Each kind of inferred COMPLETE proof has its own switch, and a proof needs every kind it rests on. Expected outcomes are reasoned from
+    the specification: a COMPLETE verification step must cite evidence proving the state *of the subject's* resource at audit_at."""
+
+    bare = staticmethod(InferredEvidenceIsNotDirectProof.bare)
+
+    def account_steps(self, w, pol, cid="case_1"):
+        return [o for o in ops(plan_for(w, cid, ppol=pol)) if o[2].startswith("account_")]
+
+    def test_the_cli_switches_map_to_the_policy_and_defaults_come_from_planpolicy(self):
+        from ghostaudit.cli import plan_policy
+        self.assertEqual(plan_policy([ID, OCR]), PlanPolicy(**{**PlanPolicy().__dict__, "emit_inferred_identity_proofs": True, "emit_document_or_ocr_proofs": True}))
+        self.assertEqual(plan_policy([], emit_all=True), PlanPolicy.all_inferred())
+        self.assertEqual(plan_policy([]), PlanPolicy())
+        self.assertEqual((PlanPolicy().emit_inferred_identity_proofs, PlanPolicy().emit_scoped_snapshot_proofs, PlanPolicy().emit_document_or_ocr_proofs),
+                         (False, False, False))  # the submission default: no inferred proof (change deliberately, see the evaluation report)
+
+    # ---- 1. activity-inferred identity ---------------------------------------------------------------------------------------------
+    def test_unique_attribution_with_an_explicit_404_is_emitted_only_by_the_identity_switch(self):
+        w = InferredEvidenceIsNotDirectProof().strong_world()
+        want = [("VER", "VERIFY_RECORD_ABSENT", "account_10", "evidence_1")]
+        self.assertEqual(self.account_steps(w, policy()), [])
+        self.assertEqual(self.account_steps(w, policy(SCOPED, OCR)), [])  # the other switches never stand in for identity
+        self.assertEqual(self.account_steps(w, policy(ID)), want)
+        self.assertTrue(any(x.resource_id == "account_10" and x.reason == "proof rests on inferred_identity, not direct evidence" for x in plan_for(w, ppol=policy()).withheld))
+        w.close()
+
+    def test_ambiguous_attribution_never_names_an_account_whatever_the_switches(self):
+        w = World().case("case_1", "ann@x.com").case("case_2", "bob@x.com")
+        w.worker("activity_1", "account_10", "2026-08-22T11:00:00Z").worker("activity_2", "account_11", "2026-08-22T11:20:00Z")
+        w.log("evidence_1", PRE, [self.bare("2026-09-15T10:00:00Z", "account_10", 0), self.bare("2026-09-15T10:01:00Z", "account_11", 0),
+                                  audit_line("2026-09-15T10:05:00Z", "audit_record_1", "user_1"), audit_line("2026-09-15T10:06:00Z", "audit_record_2", "user_2")]).build()
+        for cid in ("case_1", "case_2"):
+            self.assertEqual(self.account_steps(w, policy(ID, SCOPED, OCR), cid), [], cid)  # both 404s are direct; whose account is which is not known
+        w.close()
+
+    def test_an_account_owned_by_another_subjects_identifier_is_not_attributed_even_with_a_404(self):
+        w = World().case("case_1", "ann@x.com").worker("activity_1", "account_10", "2026-08-22T11:00:00Z")
+        w.log("evidence_1", PRE, lookup("2026-09-15T10:00:00Z", "account_10", "bob@x.com", rows=0) + [audit_line("2026-09-15T10:05:00Z", "audit_record_1", "user_1")]).build()
+        self.assertEqual(self.account_steps(w, policy(ID, SCOPED, OCR)), [])
+        w.close()
+
+    def test_a_record_linked_to_two_subjects_is_not_verified_for_either(self):
+        shared = lf("2026-09-15T10:05:00Z", "security_service", "audit_record_read_completed", "audit_record_1", rows=1, subject_reference="user_1",
+                    retention_until="2031-12-31T23:59:59Z", event_code="ACCOUNT_DELETION_RECORDED", note="bob@x.com")
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z")
+        w.log("evidence_1", PRE, lookup("2026-09-15T10:00:00Z", "account_10", "ann@x.com") + [shared]).build()
+        p = plan_for(w, ppol=policy(ID, SCOPED, OCR))
+        self.assertNotIn("audit_record_1", {s["resource_id"] for s in p.steps})
+        self.assertIn(("VER", "VERIFY_RECORD_ABSENT", "account_10", "evidence_1"), ops(p))  # the subject's own, directly identified account still is
+        w.close()
+
+    def test_a_404_captured_after_audit_at_proves_nothing_whatever_the_switches(self):
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z")
+        w.log("evidence_1", PRE, [audit_line("2026-09-15T10:05:00Z", "audit_record_1", "user_1")])
+        w.log("evidence_2", POST, [self.bare("2026-09-16T10:00:00Z", "account_10", 0)]).build()
+        p = plan_for(w, ppol=policy(ID, SCOPED, OCR))
+        self.assertEqual([o[2] for o in ops(p)], ["audit_record_1"])
+        self.assertTrue(all(s["evidence_id"] != "evidence_2" for s in p.steps))
+        w.close()
+
+    # ---- 2. subject-scoped snapshots -----------------------------------------------------------------------------------------------
+    def test_snapshot_absence_for_an_activity_attributed_account_needs_both_switches(self):
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z").json("evidence_2", SNAP_PRE, snapshot(SNAP_PRE)).build()
+        self.assertEqual(self.account_steps(w, policy(SCOPED)), [])
+        self.assertEqual(self.account_steps(w, policy(ID)), [])
+        self.assertEqual(self.account_steps(w, policy(ID, SCOPED)), [("VER", "VERIFY_RECORD_ABSENT", "account_10", "evidence_2")])
+        reasons = {x.reason for x in plan_for(w, ppol=policy(SCOPED)).withheld if x.resource_id == "account_10"}
+        self.assertEqual(reasons, {"proof rests on inferred_identity, not direct evidence"})
+        w.close()
+
+    def test_snapshot_absence_for_an_identifier_linked_account_needs_only_the_snapshot_switch(self):
+        # the subject's e-mail names account_10 only in a log captured after audit_at: identity yes (a stable account), state no
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z").json("evidence_2", SNAP_PRE, snapshot(SNAP_PRE))
+        w.log("evidence_3", POST, lookup("2026-09-16T10:00:00Z", "account_10", "ann@x.com", rows=0)).build()
+        self.assertEqual(self.account_steps(w, policy()), [])
+        self.assertEqual(self.account_steps(w, policy(ID, OCR)), [])
+        self.assertEqual(self.account_steps(w, policy(SCOPED)), [("VER", "VERIFY_RECORD_ABSENT", "account_10", "evidence_2")])
+        w.close()
+
+    def test_a_snapshot_that_does_not_cover_the_subject_supports_nothing(self):
+        # it declares a profile collection but lists only another subject's record: an incomplete extract says nothing about this subject
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z").json("evidence_2", SNAP_PRE, snapshot(SNAP_PRE, subject="user_2")).build()
+        v = classify_all(w.cr, w.ds.requests.rows)["case_1"]
+        self.assertEqual(v.determination, "PARTIAL")
+        self.assertFalse(any(r.kind == "scoped_snapshot" for r in v.requirements))
+        self.assertEqual(self.account_steps(w, policy(ID, SCOPED, OCR)), [])
+        w.close()
+
+    def test_a_snapshot_captured_after_audit_at_supports_nothing(self):
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z").json("evidence_2", POST, snapshot(POST))
+        w.log("evidence_1", PRE, [audit_line("2026-09-15T10:05:00Z", "audit_record_9", "user_1")]).build()
+        p = plan_for(w, ppol=policy(ID, SCOPED, OCR))
+        self.assertEqual([o[2] for o in ops(p) if o[2].startswith("account_")], [])
+        self.assertTrue(all(s["evidence_id"] != "evidence_2" for s in p.steps))
+        w.close()
+
+    # ---- 3. OCR / document-derived state -------------------------------------------------------------------------------------------
+    def test_ocr_grounding_levels(self):
+        from ghostaudit.classification import DOCUMENT_OR_OCR, HIGH, INFERRED_IDENTITY, LOW, MEDIUM, _inferences, evidence_confidence
+        from ghostaudit.state import StateEvidence
+
+        def shot(g):
+            return StateEvidence("evidence_9", "ocr:a", "PRESENT", "screenshot.record_visible", PRE, None, True, "usable", ocr=True, fmt="image", grounding=g)
+        self.assertEqual([evidence_confidence(shot(g)) for g in ("catalog+ocr", "catalog_time_only", "conflict")], [MEDIUM, LOW, LOW])  # LOW is never proof
+        self.assertEqual(_inferences(HIGH, [shot("catalog+ocr")]), (DOCUMENT_OR_OCR,))
+        self.assertEqual(_inferences(MEDIUM, [shot("catalog+ocr")]), (INFERRED_IDENTITY, DOCUMENT_OR_OCR))
+        log_ev = StateEvidence("evidence_1", "line:1", "PRESENT", "log", PRE, None, True, "usable", fmt="log")
+        self.assertEqual(_inferences(HIGH, [log_ev, shot("catalog+ocr")]), ())  # a structured reading at the same instant makes it direct
+
+    def test_ocr_proofs_follow_their_switch_and_combined_proofs_need_every_switch(self):
+        H = HandBuiltVerdicts
+        ocr = Requirement("RETAINED_PRESENT", "audit_record_1", "SECURITY_AUDIT_LOG", "VERIFY_RECORD_PRESENT", "PROVEN", "MEDIUM", ("evidence_1",), "screenshot", "r",
+                          kind="document_or_ocr", inferences=("document_or_ocr",))
+        both = Requirement("ACCOUNT_ABSENT", "account_1", "USER_PROFILE", "VERIFY_RECORD_ABSENT", "PROVEN", "MEDIUM", ("evidence_1",), "screenshot", "r",
+                           kind="inferred_identity", inferences=("inferred_identity", "document_or_ocr"))
+        v = H.verdict(COMPLETE, requirements=[ocr, both])
+
+        def got(pol):
+            return sorted(s["resource_id"] for s in build_plan(v, H.MAN, pol).steps)
+        self.assertEqual(got(policy()), [])
+        self.assertEqual(got(policy(OCR)), ["audit_record_1"])
+        self.assertEqual(got(policy(ID)), [])
+        self.assertEqual(got(policy(ID, OCR)), ["account_1", "audit_record_1"])
+
+    def test_an_indirect_kind_without_listed_inferences_fails_closed(self):
+        H = HandBuiltVerdicts
+        r = H.req("search_1", kind="inferred_identity")  # built by hand without ``inferences``
+        self.assertEqual(build_plan(H.verdict(COMPLETE, requirements=[r]), H.MAN, policy()).steps, ())
+        self.assertEqual(len(build_plan(H.verdict(COMPLETE, requirements=[r]), H.MAN, policy(ID)).steps), 1)
+        odd = H.req("search_1", kind="set_wise")  # a kind no switch allows is never emitted
+        self.assertEqual(build_plan(H.verdict(COMPLETE, requirements=[odd]), H.MAN, policy(ID, SCOPED, OCR)).steps, ())
 
 
 class UnresolvedAccounts(unittest.TestCase):
@@ -406,7 +556,7 @@ class RealData(unittest.TestCase):
         self.assertTrue(all(s["evidence_id"] != "evidence_60" for p in self.plans.values() for s in p.steps))
 
     def test_emit_inferred_switch_only_adds_cited_steps_and_never_names_unresolved_accounts(self):
-        more = plan_all(self.v, self.cr.manifest, PlanPolicy(emit_inferred_proofs=True))
+        more = plan_all(self.v, self.cr.manifest, PlanPolicy.all_inferred())
         added = 0
         for c, p in more.items():
             base = {(s["resource_id"], s["operation"]) for s in self.plans[c].steps}
@@ -438,10 +588,13 @@ class RealData(unittest.TestCase):
             rows = parse_output_csv(out.read_bytes().decode("utf-8"))
             self.assertEqual([x["case_id"] for x in rows], [f"case_{i:02d}" for i in range(1, 33)])
             self.assertEqual(validate_output_rows(rows, None, None, allow_empty_deletion_steps=True), [])
-        root = subprocess.run([sys.executable, "-m", "ghostaudit", "--dataset", str(DATASET), "predict", "--out", str(DATASET.parent / "output.csv")], cwd=CODE_DIR, capture_output=True, text=True)
+        target = DATASET.parent / "output.csv"
+        before = target.read_bytes() if target.exists() else None  # the submission file may legitimately exist already
+        root = subprocess.run([sys.executable, "-m", "ghostaudit", "--dataset", str(DATASET), "predict", "--out", str(target)], cwd=CODE_DIR, capture_output=True, text=True)
         self.assertEqual(root.returncode, 2)
         self.assertIn("refusing", root.stderr)
-        self.assertFalse((DATASET.parent / "output.csv").exists())
+        self.assertEqual(target.read_bytes() if target.exists() else None, before)  # neither created nor changed
+        self.assertFalse(target.with_name("output.csv.part").exists())
 
     def test_two_full_runs_are_identical(self):
         from ghostaudit.reconstruction import CaseReconstructor

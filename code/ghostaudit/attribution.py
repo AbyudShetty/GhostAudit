@@ -15,8 +15,9 @@ Hard filters (all must hold for a candidate):
    not proof of state (validated: 252 of 253 content-linked pairs agree);
 4. the account is not owned (by any content link) by a different user.
 
-Resolution: a case whose own account is already linked by content and whose delete row passes 1-3 is
-``CONTENT`` (high confidence). Otherwise, candidates are the unowned accounts passing 1-3. Unique
+Resolution: a case whose own account is already linked by content and whose delete row passes 1-2 is
+``CONTENT`` (high confidence; filter 3 is not applied to it, because the identifier already says whose account it is and a
+partially completed workflow can contain a successful account delete). Otherwise, candidates are the unowned accounts passing 1-3. Unique
 candidates are assigned and removed from every other case's pool, repeatedly, until nothing changes
 (order-independent, because only forced moves are made). What remains with several candidates is
 ``AMBIGUOUS`` and keeps the whole candidate list; with none, ``NONE``. Nothing is ever guessed.
@@ -109,14 +110,15 @@ class AccountAttributor:
                 if owners.get(rid) and u not in owners[rid]:
                     rejected[c.case_id].append((rid, "owned by another user"))
                     continue
+                if u in owners.get(rid, ()):
+                    # the subject's own identifier already names this account: the result key only chooses among *unowned* accounts,
+                    # and a partial workflow can contain a successful account delete
+                    own_hits.append(rid)
+                    continue
                 if self.require_result_match and want is not None and a.reported_result != want:
                     rejected[c.case_id].append((rid, f"result {a.reported_result} incompatible with reported_status {c.reported_status}"))
                     continue
-                cand = AccountCandidate(rid, a.activity_id, a.event_time, round(off, 1), a.reported_result)
-                if u in owners.get(rid, ()):
-                    own_hits.append(rid)
-                else:
-                    pools[c.case_id][rid] = cand
+                pools[c.case_id][rid] = AccountCandidate(rid, a.activity_id, a.event_time, round(off, 1), a.reported_result)
             if len(own_hits) == 1:
                 out[c.case_id] = AccountAttribution(c.case_id, u, CONTENT, HIGH, own_hits[0], (), (
                     f"content link + deletion-worker row {self.events[own_hits[0]].activity_id} inside the lifecycle window with a result compatible with reported_status",),
