@@ -10,3 +10,9 @@ scratch/
 # the submission archive is a build product (python code/tools/package.py); in-progress writes too
 /code.zip
 *.part
+
+# generated artifacts and local logs
+dataset/dataset.zip
+output.csv
+code.zip
+log.txt
