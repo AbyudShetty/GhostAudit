@@ -53,7 +53,10 @@ eligible observations; S3 as S2 but resource→user *association* may come from 
   38 SUCCESS / 20 PARTIAL / 23 FAILED / 9 absent. 262 of 518 cases have no account linkable by content at all
   (even under S3) and depend on activity-timing attribution or on information absent from the files.
 
-**[decision for M2]** Treat identity/association as a stable mapping that may use all supplied metadata
+**[superseded by M2 — see `m2_identity_linking.md`]** The M1 recommendation was S3. M2 refined it to **S3k**
+(post-audit sources may identify only account / security-audit / legal-hold resources) and corrected two M1 numbers:
+the "90 accounts" figure is 81 in deletion cases + 9 in non-deletion requests, and the "39" was not reproducible.
+Original M1 text: treat identity/association as a stable mapping that may use all supplied metadata
 (S3), but enforce eligibility for every *state* observation and every *citation*. This is the only strategy that
 reaches the 8 gold resources above. **[hypothesis]** the alternative explanation — those resources are obtained
 through activity-timing attribution rather than post-audit links — cannot be excluded with 32 samples; M2
