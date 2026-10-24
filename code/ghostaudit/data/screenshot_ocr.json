@@ -1,0 +1,4637 @@
+{
+ "engine": "Windows.Media.Ocr en-US",
+ "images": {
+  "evidence_04": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Customers",
+     "x": 53,
+     "y": 101
+    },
+    {
+     "text": "Orders",
+     "x": 53,
+     "y": 146
+    },
+    {
+     "text": "Support",
+     "x": 53,
+     "y": 191
+    },
+    {
+     "text": "Catalog",
+     "x": 53,
+     "y": 236
+    },
+    {
+     "text": "Promotions",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "Analytics",
+     "x": 53,
+     "y": 326
+    },
+    {
+     "text": "Customer Operations",
+     "x": 22,
+     "y": 1122
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1138
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1155
+    },
+    {
+     "text": "Customer Operations",
+     "x": 244,
+     "y": 23
+    },
+    {
+     "text": "p Search customers, orders, tickets...",
+     "x": 468,
+     "y": 23
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "co",
+     "x": 1754,
+     "y": 24
+    },
+    {
+     "text": "Northstar Shop I Customer Operations I Customers",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Haruka Sato",
+     "x": 247,
+     "y": 106
+    },
+    {
+     "text": "Silver",
+     "x": 410,
+     "y": 107
+    },
+    {
+     "text": "user_ll \u0007 account _5762",
+     "x": 247,
+     "y": 138
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Last contact",
+     "x": 1543,
+     "y": 235
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "Overview",
+     "x": 248,
+     "y": 178
+    },
+    {
+     "text": "Email",
+     "x": 260,
+     "y": 234
+    },
+    {
+     "text": "Orders",
+     "x": 332,
+     "y": 178
+    },
+    {
+     "text": "Addresses",
+     "x": 399,
+     "y": 178
+    },
+    {
+     "text": "haruka.s1838@zoho.com",
+     "x": 260,
+     "y": 254
+    },
+    {
+     "text": "Overview",
+     "x": 261,
+     "y": 333
+    },
+    {
+     "text": "order ID",
+     "x": 258,
+     "y": 374
+    },
+    {
+     "text": "ORD-20265762",
+     "x": 283,
+     "y": 410
+    },
+    {
+     "text": "ORD-20265518",
+     "x": 283,
+     "y": 451
+    },
+    {
+     "text": "Support history",
+     "x": 486,
+     "y": 179
+    },
+    {
+     "text": "Phone",
+     "x": 516,
+     "y": 235
+    },
+    {
+     "text": "+81 90 7610 2507",
+     "x": 516,
+     "y": 255
+    },
+    {
+     "text": "12 Sep 2026",
+     "x": 512,
+     "y": 409
+    },
+    {
+     "text": "28 Aug 2026",
+     "x": 513,
+     "y": 450
+    },
+    {
+     "text": "Signup channel",
+     "x": 773,
+     "y": 234
+    },
+    {
+     "text": "mobile_app",
+     "x": 773,
+     "y": 254
+    },
+    {
+     "text": "Item",
+     "x": 689,
+     "y": 374
+    },
+    {
+     "text": "Ceramic coffee set",
+     "x": 689,
+     "y": 409
+    },
+    {
+     "text": "Travel backpack",
+     "x": 688,
+     "y": 450
+    },
+    {
+     "text": "Qty",
+     "x": 926,
+     "y": 374
+    },
+    {
+     "text": "Market",
+     "x": 1030,
+     "y": 234
+    },
+    {
+     "text": "JP",
+     "x": 1029,
+     "y": 255
+    },
+    {
+     "text": "Tota I",
+     "x": 1006,
+     "y": 374
+    },
+    {
+     "text": "JPY B,goo",
+     "x": 1006,
+     "y": 409
+    },
+    {
+     "text": "JPY 12,400",
+     "x": 1006,
+     "y": 450
+    },
+    {
+     "text": "Preferred language",
+     "x": 1286,
+     "y": 234
+    },
+    {
+     "text": "Japanese",
+     "x": 1286,
+     "y": 255
+    },
+    {
+     "text": "Updated moments ago \u0007 2 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "\u0007 1B Sep",
+     "x": 1220,
+     "y": 409
+    },
+    {
+     "text": "03 Sep",
+     "x": 1225,
+     "y": 450
+    },
+    {
+     "text": "24 sep 2026 09:14 JST",
+     "x": 1543,
+     "y": 255
+    },
+    {
+     "text": "Customer details",
+     "x": 1441,
+     "y": 333
+    },
+    {
+     "text": "Status",
+     "x": 1165,
+     "y": 374
+    },
+    {
+     "text": "Delivered",
+     "x": 1165,
+     "y": 409
+    },
+    {
+     "text": "Returned",
+     "x": 1165,
+     "y": 450
+    },
+    {
+     "text": "Default address",
+     "x": 1442,
+     "y": 380
+    },
+    {
+     "text": "Loyalty tier",
+     "x": 1442,
+     "y": 428
+    },
+    {
+     "text": "Support",
+     "x": 1442,
+     "y": 461
+    },
+    {
+     "text": "Member since",
+     "x": 1442,
+     "y": 493
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 541
+    },
+    {
+     "text": "24 Sep",
+     "x": 1464,
+     "y": 565
+    },
+    {
+     "text": "2-18-4 Kichijoji, Musashino, Tokyo",
+     "x": 1557,
+     "y": 381
+    },
+    {
+     "text": "180-0004",
+     "x": 1557,
+     "y": 397
+    },
+    {
+     "text": "Silver",
+     "x": 1557,
+     "y": 429
+    },
+    {
+     "text": "CS-8s38 \u0007 support_9538",
+     "x": 1557,
+     "y": 462
+    },
+    {
+     "text": "12 Jan 2024",
+     "x": 1557,
+     "y": 494
+    },
+    {
+     "text": "Customer replied to CS-8S38",
+     "x": 1464,
+     "y": 580
+    },
+    {
+     "text": "22 Sep",
+     "x": 1464,
+     "y": 610
+    },
+    {
+     "text": "Support agent responded",
+     "x": 1464,
+     "y": 625
+    },
+    {
+     "text": "18 Sep",
+     "x": 1464,
+     "y": 655
+    },
+    {
+     "text": "order ORD-2026S762 delivered",
+     "x": 1464,
+     "y": 670
+    },
+    {
+     "text": "03 Sep",
+     "x": 1464,
+     "y": 700
+    },
+    {
+     "text": "order ORD-2026SS18 returned",
+     "x": 1464,
+     "y": 715
+    },
+    {
+     "text": "28 Aug",
+     "x": 1464,
+     "y": 745
+    },
+    {
+     "text": "support_9S3E created",
+     "x": 1464,
+     "y": 760
+    }
+   ],
+   "path": "evidence/images/account_admin_console_20260926.png",
+   "sha256": "d5c32ca5b6e1a2b4bbe9f5d41835ef1fd5d4f7061dab9067a4f9f88cea3c1861"
+  },
+  "evidence_09": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Customer Search",
+     "x": 53,
+     "y": 101
+    },
+    {
+     "text": "Product Search",
+     "x": 54,
+     "y": 146
+    },
+    {
+     "text": "Order Search",
+     "x": 53,
+     "y": 191
+    },
+    {
+     "text": "Indexes",
+     "x": 54,
+     "y": 236
+    },
+    {
+     "text": "Cluster health",
+     "x": 53,
+     "y": 281
+    },
+    {
+     "text": "low queries",
+     "x": 62,
+     "y": 326
+    },
+    {
+     "text": "Search Console",
+     "x": 22,
+     "y": 1022
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1038
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1055
+    },
+    {
+     "text": "Search Console",
+     "x": 244,
+     "y": 23
+    },
+    {
+     "text": "p email:g.silva76@gmail.com",
+     "x": 468,
+     "y": 23
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "sc",
+     "x": 1755,
+     "y": 24
+    },
+    {
+     "text": "Northstar Shop / Search Console I Customer Search",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Customer Search",
+     "x": 247,
+     "y": 106
+    },
+    {
+     "text": "2 hits",
+     "x": 468,
+     "y": 107
+    },
+    {
+     "text": "customer_directory_v3 / prod-eu",
+     "x": 246,
+     "y": 138
+    },
+    {
+     "text": "Index",
+     "x": 876,
+     "y": 235
+    },
+    {
+     "text": "customer_directory_v3",
+     "x": 875,
+     "y": 254
+    },
+    {
+     "text": "Customer reference",
+     "x": 904,
+     "y": 374
+    },
+    {
+     "text": "user_13",
+     "x": 904,
+     "y": 409
+    },
+    {
+     "text": "Environment",
+     "x": 1184,
+     "y": 234
+    },
+    {
+     "text": "prod-eu",
+     "x": 1184,
+     "y": 254
+    },
+    {
+     "text": "Updated moments ago \u0007 2 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Last indexed",
+     "x": 1245,
+     "y": 374
+    },
+    {
+     "text": "LITC",
+     "x": 1296,
+     "y": 409
+    },
+    {
+     "text": "LITC",
+     "x": 1298,
+     "y": 450
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Shard total",
+     "x": 1491,
+     "y": 234
+    },
+    {
+     "text": "184 ms",
+     "x": 1492,
+     "y": 255
+    },
+    {
+     "text": "Raw document \u0007 search_428",
+     "x": 1442,
+     "y": 333
+    },
+    {
+     "text": "-index",
+     "x": 1441,
+     "y": 380
+    },
+    {
+     "text": "display_name",
+     "x": 1441,
+     "y": 445
+    },
+    {
+     "text": "email",
+     "x": 1441,
+     "y": 478
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "Results (2)",
+     "x": 249,
+     "y": 178
+    },
+    {
+     "text": "Executed",
+     "x": 260,
+     "y": 235
+    },
+    {
+     "text": "Query details",
+     "x": 342,
+     "y": 178
+    },
+    {
+     "text": "Shard timing",
+     "x": 445,
+     "y": 178
+    },
+    {
+     "text": "01 sep 2026 UTC",
+     "x": 260,
+     "y": 255
+    },
+    {
+     "text": "Results (2)",
+     "x": 262,
+     "y": 333
+    },
+    {
+     "text": "Display name",
+     "x": 465,
+     "y": 374
+    },
+    {
+     "text": "Gabriel Silva",
+     "x": 464,
+     "y": 409
+    },
+    {
+     "text": "search_428",
+     "x": 283,
+     "y": 410
+    },
+    {
+     "text": "search_1874",
+     "x": 283,
+     "y": 451
+    },
+    {
+     "text": "Latency",
+     "x": 568,
+     "y": 235
+    },
+    {
+     "text": "184 ms",
+     "x": 568,
+     "y": 255
+    },
+    {
+     "text": "Email",
+     "x": 640,
+     "y": 374
+    },
+    {
+     "text": "g.silva76@gmaiI.com",
+     "x": 640,
+     "y": 409
+    },
+    {
+     "text": "g.silva76.jr@gmaiI.com",
+     "x": 640,
+     "y": 450
+    },
+    {
+     "text": "Score",
+     "x": 1146,
+     "y": 374
+    },
+    {
+     "text": "9.84",
+     "x": 1146,
+     "y": 409
+    },
+    {
+     "text": "4.12",
+     "x": 1146,
+     "y": 450
+    },
+    {
+     "text": "search_42B",
+     "x": 1557,
+     "y": 414
+    },
+    {
+     "text": "Gabriel Silva",
+     "x": 1557,
+     "y": 446
+    },
+    {
+     "text": "g.silva76@gmaiI.com",
+     "x": 1557,
+     "y": 479
+    },
+    {
+     "text": "customer_reference user_13",
+     "x": 1441,
+     "y": 510
+    },
+    {
+     "text": "indexed_at",
+     "x": 1442,
+     "y": 543
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 590
+    },
+    {
+     "text": "06:00:14",
+     "x": 1464,
+     "y": 614
+    },
+    {
+     "text": "2 hits",
+     "x": 1610,
+     "y": 629
+    },
+    {
+     "text": "I hit",
+     "x": 1632,
+     "y": 674
+    },
+    {
+     "text": "Jain\" \u0007 I hit",
+     "x": 1566,
+     "y": 719
+    }
+   ],
+   "path": "evidence/images/search_index_inspector_20260901.png",
+   "sha256": "75afdb0ae53a4510c83399a70d88073cb4fb2747454095756e4ddad1a8c70605"
+  },
+  "evidence_14": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Connections",
+     "x": 53,
+     "y": 101
+    },
+    {
+     "text": "Topology",
+     "x": 53,
+     "y": 146
+    },
+    {
+     "text": "Monitoring",
+     "x": 54,
+     "y": 191
+    },
+    {
+     "text": "Events",
+     "x": 54,
+     "y": 236
+    },
+    {
+     "text": "Destinations",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "Settings",
+     "x": 53,
+     "y": 326
+    },
+    {
+     "text": "BridgeOps",
+     "x": 23,
+     "y": 1072
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1088
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1105
+    },
+    {
+     "text": "BridgeOps",
+     "x": 245,
+     "y": 23
+    },
+    {
+     "text": "p Search connectors...",
+     "x": 468,
+     "y": 23
+    },
+    {
+     "text": "Northstar Shop I BridgeOps I Connections",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "12 connectors",
+     "x": 573,
+     "y": 108
+    },
+    {
+     "text": "PRODUCTION eu-west 07 Aug 2026 08:00 UTC",
+     "x": 247,
+     "y": 138
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "Topology",
+     "x": 248,
+     "y": 178
+    },
+    {
+     "text": "Healthy",
+     "x": 260,
+     "y": 235
+    },
+    {
+     "text": "12",
+     "x": 260,
+     "y": 255
+    },
+    {
+     "text": "Topology",
+     "x": 261,
+     "y": 333
+    },
+    {
+     "text": "Throughput",
+     "x": 331,
+     "y": 178
+    },
+    {
+     "text": "Recent deliveries",
+     "x": 426,
+     "y": 178
+    },
+    {
+     "text": "Events I hour",
+     "x": 568,
+     "y": 235
+    },
+    {
+     "text": "4,113",
+     "x": 567,
+     "y": 255
+    },
+    {
+     "text": "Destination",
+     "x": 487,
+     "y": 374
+    },
+    {
+     "text": "customer_ana lytics_warehouse",
+     "x": 486,
+     "y": 409
+    },
+    {
+     "text": "customer_ana lytics_warehouse",
+     "x": 486,
+     "y": 450
+    },
+    {
+     "text": "notification_service",
+     "x": 487,
+     "y": 491
+    },
+    {
+     "text": "logistics_warehouse",
+     "x": 487,
+     "y": 532
+    },
+    {
+     "text": "Delivery p95",
+     "x": 876,
+     "y": 234
+    },
+    {
+     "text": "1.8 s",
+     "x": 876,
+     "y": 255
+    },
+    {
+     "text": "Selector",
+     "x": 781,
+     "y": 374
+    },
+    {
+     "text": "jain.aditi@gmail.com",
+     "x": 780,
+     "y": 409
+    },
+    {
+     "text": "lucia-torres@gmail.com",
+     "x": 781,
+     "y": 450
+    },
+    {
+     "text": "order events",
+     "x": 781,
+     "y": 491
+    },
+    {
+     "text": "shipment events",
+     "x": 781,
+     "y": 532
+    },
+    {
+     "text": "Backlog",
+     "x": 1184,
+     "y": 235
+    },
+    {
+     "text": "18",
+     "x": 1184,
+     "y": 255
+    },
+    {
+     "text": "Updated moments ago 4 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Destination health",
+     "x": 1492,
+     "y": 234
+    },
+    {
+     "text": "Healthy",
+     "x": 1492,
+     "y": 254
+    },
+    {
+     "text": "data_flow_1121",
+     "x": 1441,
+     "y": 333
+    },
+    {
+     "text": "Connector",
+     "x": 258,
+     "y": 374
+    },
+    {
+     "text": "Order notifications",
+     "x": 283,
+     "y": 492
+    },
+    {
+     "text": "Delivery tracking",
+     "x": 284,
+     "y": 533
+    },
+    {
+     "text": "Mode",
+     "x": 1013,
+     "y": 374
+    },
+    {
+     "text": "Continuous",
+     "x": 1013,
+     "y": 409
+    },
+    {
+     "text": "Continuous",
+     "x": 1013,
+     "y": 450
+    },
+    {
+     "text": "Continuous",
+     "x": 1013,
+     "y": 491
+    },
+    {
+     "text": "Continuous",
+     "x": 1013,
+     "y": 532
+    },
+    {
+     "text": "Events/hour",
+     "x": 1142,
+     "y": 374
+    },
+    {
+     "text": "1,284",
+     "x": 1142,
+     "y": 409
+    },
+    {
+     "text": "842",
+     "x": 1142,
+     "y": 450
+    },
+    {
+     "text": "420",
+     "x": 1142,
+     "y": 532
+    },
+    {
+     "text": "Last contact",
+     "x": 1280,
+     "y": 374
+    },
+    {
+     "text": "Status",
+     "x": 1442,
+     "y": 380
+    },
+    {
+     "text": "Owner",
+     "x": 1441,
+     "y": 413
+    },
+    {
+     "text": "Destination",
+     "x": 1442,
+     "y": 445
+    },
+    {
+     "text": "Selector",
+     "x": 1442,
+     "y": 478
+    },
+    {
+     "text": "Sync mode",
+     "x": 1442,
+     "y": 510
+    },
+    {
+     "text": "Last response",
+     "x": 1442,
+     "y": 543
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 590
+    },
+    {
+     "text": "Healthy",
+     "x": 1557,
+     "y": 381
+    },
+    {
+     "text": "Data Platform",
+     "x": 1558,
+     "y": 414
+    },
+    {
+     "text": "Cu stomer_ana lytics_wa rehouse",
+     "x": 1557,
+     "y": 446
+    },
+    {
+     "text": "jain.aditi@gmail.com",
+     "x": 1556,
+     "y": 479
+    },
+    {
+     "text": "Continuous Sy nc",
+     "x": 1557,
+     "y": 511
+    },
+    {
+     "text": "200 0K \u0007 1.8 S",
+     "x": 1557,
+     "y": 544
+    },
+    {
+     "text": "124 events delivered",
+     "x": 1464,
+     "y": 629
+    },
+    {
+     "text": "07:58:10",
+     "x": 1464,
+     "y": 659
+    },
+    {
+     "text": "checkpoint committed",
+     "x": 1464,
+     "y": 674
+    },
+    {
+     "text": "18 events retried",
+     "x": 1464,
+     "y": 719
+    },
+    {
+     "text": "destination acknowledged batch",
+     "x": 1464,
+     "y": 764
+    }
+   ],
+   "path": "evidence/images/connector_management_console_20260807.png",
+   "sha256": "e81fabc93ea1b5f4c918d934cdb2bea05d61737adfcc29f281494f5d8ec46355"
+  },
+  "evidence_19": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Overview",
+     "x": 53,
+     "y": 101
+    },
+    {
+     "text": "Real-time",
+     "x": 54,
+     "y": 146
+    },
+    {
+     "text": "Users",
+     "x": 54,
+     "y": 191
+    },
+    {
+     "text": "Products",
+     "x": 54,
+     "y": 236
+    },
+    {
+     "text": "Funnels",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "Journeys",
+     "x": 53,
+     "y": 326
+    },
+    {
+     "text": "Audiences",
+     "x": 53,
+     "y": 371
+    },
+    {
+     "text": "Reports",
+     "x": 54,
+     "y": 416
+    },
+    {
+     "text": "Pulse Analytics",
+     "x": 23,
+     "y": 1072
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1089
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1105
+    },
+    {
+     "text": "Pulse Analytics",
+     "x": 245,
+     "y": 23
+    },
+    {
+     "text": "Northstar Shop I Pulse Analytics I users",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Omar Darwish",
+     "x": 247,
+     "y": 105
+    },
+    {
+     "text": "Search users, products, orders or events...",
+     "x": 491,
+     "y": 23
+    },
+    {
+     "text": "Last 90 days",
+     "x": 592,
+     "y": 107
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "PA",
+     "x": 1755,
+     "y": 24
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Acquisition",
+     "x": 1542,
+     "y": 234
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "user_20 analytics_7438 darwish.omar@icloud.com",
+     "x": 247,
+     "y": 138
+    },
+    {
+     "text": "Event timeline",
+     "x": 249,
+     "y": 178
+    },
+    {
+     "text": "Sessions",
+     "x": 259,
+     "y": 234
+    },
+    {
+     "text": "12",
+     "x": 260,
+     "y": 255
+    },
+    {
+     "text": "Event timeline",
+     "x": 262,
+     "y": 333
+    },
+    {
+     "text": "Time",
+     "x": 258,
+     "y": 374
+    },
+    {
+     "text": "14:22",
+     "x": 283,
+     "y": 410
+    },
+    {
+     "text": "14:20",
+     "x": 283,
+     "y": 451
+    },
+    {
+     "text": "14:17",
+     "x": 283,
+     "y": 492
+    },
+    {
+     "text": "14:16",
+     "x": 283,
+     "y": 533
+    },
+    {
+     "text": "14:12",
+     "x": 283,
+     "y": 574
+    },
+    {
+     "text": "Sessions (12)",
+     "x": 361,
+     "y": 178
+    },
+    {
+     "text": "Orders (2)",
+     "x": 465,
+     "y": 178
+    },
+    {
+     "text": "Products viewed (19)",
+     "x": 551,
+     "y": 178
+    },
+    {
+     "text": "Products viewed",
+     "x": 516,
+     "y": 234
+    },
+    {
+     "text": "19",
+     "x": 516,
+     "y": 255
+    },
+    {
+     "text": "Order completed",
+     "x": 452,
+     "y": 409
+    },
+    {
+     "text": "Checkout started",
+     "x": 452,
+     "y": 450
+    },
+    {
+     "text": "Product viewed",
+     "x": 452,
+     "y": 491
+    },
+    {
+     "text": "Added to cart",
+     "x": 451,
+     "y": 532
+    },
+    {
+     "text": "Product viewed",
+     "x": 452,
+     "y": 573
+    },
+    {
+     "text": "Completed orders",
+     "x": 773,
+     "y": 234
+    },
+    {
+     "text": "2",
+     "x": 773,
+     "y": 254
+    },
+    {
+     "text": "Product / detail",
+     "x": 741,
+     "y": 374
+    },
+    {
+     "text": "Ceramic coffee set",
+     "x": 741,
+     "y": 409
+    },
+    {
+     "text": "2 items",
+     "x": 741,
+     "y": 450
+    },
+    {
+     "text": "Ceramic coffee set",
+     "x": 741,
+     "y": 491
+    },
+    {
+     "text": "Ceramic coffee set",
+     "x": 741,
+     "y": 532
+    },
+    {
+     "text": "Stoneware mug",
+     "x": 741,
+     "y": 573
+    },
+    {
+     "text": "Revenue",
+     "x": 1030,
+     "y": 235
+    },
+    {
+     "text": "USD 167.42",
+     "x": 1030,
+     "y": 255
+    },
+    {
+     "text": "Va lue",
+     "x": 1052,
+     "y": 374
+    },
+    {
+     "text": "LISD 84.21",
+     "x": 1052,
+     "y": 409
+    },
+    {
+     "text": "LISD 84.21",
+     "x": 1052,
+     "y": 450
+    },
+    {
+     "text": "LISD 42.00",
+     "x": 1052,
+     "y": 532
+    },
+    {
+     "text": "LISD 18.00",
+     "x": 1052,
+     "y": 573
+    },
+    {
+     "text": "Mobile / Desktop",
+     "x": 1286,
+     "y": 234
+    },
+    {
+     "text": "Updated moments ago \u0007 5 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Device",
+     "x": 1255,
+     "y": 374
+    },
+    {
+     "text": "Mobile",
+     "x": 1255,
+     "y": 409
+    },
+    {
+     "text": "Mobile",
+     "x": 1255,
+     "y": 450
+    },
+    {
+     "text": "Mobile",
+     "x": 1255,
+     "y": 491
+    },
+    {
+     "text": "Mobile",
+     "x": 1255,
+     "y": 532
+    },
+    {
+     "text": "Desktop",
+     "x": 1255,
+     "y": 573
+    },
+    {
+     "text": "Organic search",
+     "x": 1543,
+     "y": 254
+    },
+    {
+     "text": "Profile attributes",
+     "x": 1442,
+     "y": 333
+    },
+    {
+     "text": "Market",
+     "x": 1442,
+     "y": 380
+    },
+    {
+     "text": "Audience",
+     "x": 1441,
+     "y": 413
+    },
+    {
+     "text": "Interest",
+     "x": 1442,
+     "y": 445
+    },
+    {
+     "text": "Last activity",
+     "x": 1442,
+     "y": 478
+    },
+    {
+     "text": "First seen",
+     "x": 1442,
+     "y": 510
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 558
+    },
+    {
+     "text": "13 Jul",
+     "x": 1464,
+     "y": 582
+    },
+    {
+     "text": "Returning shopper",
+     "x": 1558,
+     "y": 414
+    },
+    {
+     "text": "Coffee & dining",
+     "x": 1557,
+     "y": 446
+    },
+    {
+     "text": "13 Jul 202614:22 UTC",
+     "x": 1557,
+     "y": 479
+    },
+    {
+     "text": "21 Apr 2026 09:14 UTC",
+     "x": 1557,
+     "y": 511
+    },
+    {
+     "text": "6 events in active session",
+     "x": 1464,
+     "y": 597
+    },
+    {
+     "text": "08 Jul",
+     "x": 1464,
+     "y": 627
+    },
+    {
+     "text": "Order completed \u0007 LISD 83.21",
+     "x": 1464,
+     "y": 642
+    },
+    {
+     "text": "30 Jun",
+     "x": 1464,
+     "y": 672
+    },
+    {
+     "text": "Product search \u0007 coffee set",
+     "x": 1465,
+     "y": 687
+    },
+    {
+     "text": "22 Jun",
+     "x": 1464,
+     "y": 717
+    },
+    {
+     "text": "Campaign opened",
+     "x": 1464,
+     "y": 732
+    }
+   ],
+   "path": "evidence/images/analytics_profile_view_20260713.png",
+   "sha256": "4e4cb259bc2010b622b0c53fe5872258f994fefc23452a83bb27473758693484"
+  },
+  "evidence_23": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Home",
+     "x": 54,
+     "y": 101
+    },
+    {
+     "text": "Orders",
+     "x": 53,
+     "y": 146
+    },
+    {
+     "text": "Customers",
+     "x": 53,
+     "y": 191
+    },
+    {
+     "text": "Data exports",
+     "x": 54,
+     "y": 236
+    },
+    {
+     "text": "Products",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "Marketing",
+     "x": 54,
+     "y": 326
+    },
+    {
+     "text": "Analytics",
+     "x": 53,
+     "y": 371
+    },
+    {
+     "text": "Settings",
+     "x": 53,
+     "y": 416
+    },
+    {
+     "text": "Customer Download Center",
+     "x": 22,
+     "y": 1022
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1038
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1055
+    },
+    {
+     "text": "Customer Download Center",
+     "x": 244,
+     "y": 23
+    },
+    {
+     "text": "p Search exports...",
+     "x": 468,
+     "y": 23
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "CD",
+     "x": 1754,
+     "y": 24
+    },
+    {
+     "text": "Northstar Shop I Customer Download Center I Data exports",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Data exports",
+     "x": 247,
+     "y": 106
+    },
+    {
+     "text": "Create and manage customer download packages",
+     "x": 246,
+     "y": 138
+    },
+    {
+     "text": "4 jobs",
+     "x": 571,
+     "y": 107
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "All exports",
+     "x": 248,
+     "y": 178
+    },
+    {
+     "text": "Ready",
+     "x": 260,
+     "y": 235
+    },
+    {
+     "text": "2",
+     "x": 260,
+     "y": 255
+    },
+    {
+     "text": "All exports",
+     "x": 261,
+     "y": 333
+    },
+    {
+     "text": "Export I D",
+     "x": 259,
+     "y": 374
+    },
+    {
+     "text": "Ready",
+     "x": 341,
+     "y": 178
+    },
+    {
+     "text": "Processing",
+     "x": 404,
+     "y": 179
+    },
+    {
+     "text": "export_1261",
+     "x": 283,
+     "y": 410
+    },
+    {
+     "text": "export_1260",
+     "x": 283,
+     "y": 451
+    },
+    {
+     "text": "export_1259",
+     "x": 283,
+     "y": 492
+    },
+    {
+     "text": "export_1258",
+     "x": 283,
+     "y": 533
+    },
+    {
+     "text": "Filename",
+     "x": 463,
+     "y": 374
+    },
+    {
+     "text": "customer",
+     "x": 463,
+     "y": 410
+    },
+    {
+     "text": "customer",
+     "x": 463,
+     "y": 451
+    },
+    {
+     "text": "customer",
+     "x": 463,
+     "y": 492
+    },
+    {
+     "text": "customer",
+     "x": 463,
+     "y": 533
+    },
+    {
+     "text": "Expired",
+     "x": 494,
+     "y": 178
+    },
+    {
+     "text": "Processing",
+     "x": 645,
+     "y": 234
+    },
+    {
+     "text": "2",
+     "x": 645,
+     "y": 255
+    },
+    {
+     "text": "_export_1261 .zip",
+     "x": 513,
+     "y": 409
+    },
+    {
+     "text": "_export_1260. zip",
+     "x": 513,
+     "y": 450
+    },
+    {
+     "text": "_export_1259. zip",
+     "x": 513,
+     "y": 491
+    },
+    {
+     "text": "_export_1258. zip",
+     "x": 513,
+     "y": 532
+    },
+    {
+     "text": "Owner",
+     "x": 759,
+     "y": 374
+    },
+    {
+     "text": "marcus.lee@northstar.shop",
+     "x": 759,
+     "y": 409
+    },
+    {
+     "text": "ingrid.dahl@outlook.com",
+     "x": 760,
+     "y": 450
+    },
+    {
+     "text": "sara.kim@northstar.shop",
+     "x": 759,
+     "y": 491
+    },
+    {
+     "text": "daniel.park@northstar.shop",
+     "x": 759,
+     "y": 532
+    },
+    {
+     "text": "Created today",
+     "x": 1029,
+     "y": 234
+    },
+    {
+     "text": "Status",
+     "x": 1067,
+     "y": 374
+    },
+    {
+     "text": "Collecting",
+     "x": 1067,
+     "y": 409
+    },
+    {
+     "text": "Ready",
+     "x": 1068,
+     "y": 450
+    },
+    {
+     "text": "Packaging",
+     "x": 1068,
+     "y": 491
+    },
+    {
+     "text": "Ready",
+     "x": 1068,
+     "y": 532
+    },
+    {
+     "text": "Updated moments ago 4 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Created",
+     "x": 1207,
+     "y": 374
+    },
+    {
+     "text": "20 Jun 14:18 UTC",
+     "x": 1207,
+     "y": 409
+    },
+    {
+     "text": "18 Jun 06:42 UTC",
+     "x": 1207,
+     "y": 450
+    },
+    {
+     "text": "17 Jun 11:03 LITC",
+     "x": 1207,
+     "y": 491
+    },
+    {
+     "text": "16 Jun 09:27 UTC",
+     "x": 1207,
+     "y": 532
+    },
+    {
+     "text": "Downloads today",
+     "x": 1415,
+     "y": 234
+    },
+    {
+     "text": "export_1260",
+     "x": 1441,
+     "y": 333
+    },
+    {
+     "text": "Owner",
+     "x": 1441,
+     "y": 380
+    },
+    {
+     "text": "Created",
+     "x": 1441,
+     "y": 413
+    },
+    {
+     "text": "Expires",
+     "x": 1442,
+     "y": 445
+    },
+    {
+     "text": "Size",
+     "x": 1442,
+     "y": 478
+    },
+    {
+     "text": "Checksum",
+     "x": 1441,
+     "y": 510
+    },
+    {
+     "text": "Download Count",
+     "x": 1442,
+     "y": 543
+    },
+    {
+     "text": "Included",
+     "x": 1442,
+     "y": 575
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 623
+    },
+    {
+     "text": "06:46",
+     "x": 1464,
+     "y": 647
+    },
+    {
+     "text": "ingrid.dahl@outlook.com",
+     "x": 1557,
+     "y": 381
+    },
+    {
+     "text": "18 Jun 2026 06:42 UTC",
+     "x": 1557,
+     "y": 414
+    },
+    {
+     "text": "25 Jun 2026 06:42 UTC",
+     "x": 1557,
+     "y": 446
+    },
+    {
+     "text": "18.4 MB",
+     "x": 1557,
+     "y": 479
+    },
+    {
+     "text": "SHA-256 \u0007 41ca09m",
+     "x": 1557,
+     "y": 511
+    },
+    {
+     "text": "0",
+     "x": 1557,
+     "y": 544
+    },
+    {
+     "text": "Profile \u0007 Orders Saved addresses",
+     "x": 1557,
+     "y": 576
+    },
+    {
+     "text": "Ready for download",
+     "x": 1465,
+     "y": 662
+    },
+    {
+     "text": "06:45",
+     "x": 1464,
+     "y": 692
+    },
+    {
+     "text": "Package created",
+     "x": 1465,
+     "y": 707
+    },
+    {
+     "text": "06:43",
+     "x": 1464,
+     "y": 737
+    },
+    {
+     "text": "Collecting customer records",
+     "x": 1464,
+     "y": 752
+    },
+    {
+     "text": "06:42",
+     "x": 1464,
+     "y": 782
+    },
+    {
+     "text": "Export requested",
+     "x": 1465,
+     "y": 797
+    }
+   ],
+   "path": "evidence/images/customer_export_console_20260618.png",
+   "sha256": "18b95c1bd8b8956e40216df935498a9f3c181ea2a69b5cd6d3c0841a816d5557"
+  },
+  "evidence_28": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Inbox",
+     "x": 54,
+     "y": 101
+    },
+    {
+     "text": "My tickets",
+     "x": 54,
+     "y": 146
+    },
+    {
+     "text": "Assigned to me",
+     "x": 53,
+     "y": 191
+    },
+    {
+     "text": "Mentions",
+     "x": 54,
+     "y": 236
+    },
+    {
+     "text": "Customer search",
+     "x": 53,
+     "y": 281
+    },
+    {
+     "text": "Knowledge base",
+     "x": 54,
+     "y": 326
+    },
+    {
+     "text": "Reports",
+     "x": 54,
+     "y": 371
+    },
+    {
+     "text": "Helpline Console",
+     "x": 23,
+     "y": 1122
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1138
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1155
+    },
+    {
+     "text": "Helpline Console",
+     "x": 245,
+     "y": 23
+    },
+    {
+     "text": "Northstar Shop / Helpline Console / Inbox",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Search tickets, customers, orders...",
+     "x": 491,
+     "y": 23
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "HC",
+     "x": 1754,
+     "y": 24
+    },
+    {
+     "text": "CS-5034 \u0007 Where is my delivery?",
+     "x": 247,
+     "y": 105
+    },
+    {
+     "text": "support_1034 Kofi Agyeman Normal priority",
+     "x": 247,
+     "y": 138
+    },
+    {
+     "text": "SLA 01:42",
+     "x": 637,
+     "y": 108
+    },
+    {
+     "text": "Email",
+     "x": 645,
+     "y": 234
+    },
+    {
+     "text": "kagyeman8947@fastmail.com",
+     "x": 645,
+     "y": 254
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "Conversation",
+     "x": 248,
+     "y": 178
+    },
+    {
+     "text": "Customer",
+     "x": 259,
+     "y": 235
+    },
+    {
+     "text": "Internal notes",
+     "x": 356,
+     "y": 178
+    },
+    {
+     "text": "Activity",
+     "x": 461,
+     "y": 178
+    },
+    {
+     "text": "Kofi Agyeman",
+     "x": 260,
+     "y": 254
+    },
+    {
+     "text": "Conversation",
+     "x": 261,
+     "y": 333
+    },
+    {
+     "text": "Time",
+     "x": 258,
+     "y": 374
+    },
+    {
+     "text": "09:12",
+     "x": 283,
+     "y": 410
+    },
+    {
+     "text": "09:13",
+     "x": 283,
+     "y": 451
+    },
+    {
+     "text": "09:28",
+     "x": 283,
+     "y": 492
+    },
+    {
+     "text": "09:35",
+     "x": 283,
+     "y": 533
+    },
+    {
+     "text": "Assigned",
+     "x": 1029,
+     "y": 234
+    },
+    {
+     "text": "Maya Chen",
+     "x": 1030,
+     "y": 254
+    },
+    {
+     "text": "Updated moments ago 4 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Tags",
+     "x": 1414,
+     "y": 235
+    },
+    {
+     "text": "Delivery Tracking Order update",
+     "x": 1415,
+     "y": 254
+    },
+    {
+     "text": "order ORD-20265034",
+     "x": 1441,
+     "y": 333
+    },
+    {
+     "text": "Sender",
+     "x": 411,
+     "y": 374
+    },
+    {
+     "text": "Kofi Agyeman",
+     "x": 411,
+     "y": 409
+    },
+    {
+     "text": "NorthStar 30t",
+     "x": 411,
+     "y": 450
+    },
+    {
+     "text": "Maya Chen",
+     "x": 411,
+     "y": 491
+    },
+    {
+     "text": "Kofi Agyeman",
+     "x": 411,
+     "y": 532
+    },
+    {
+     "text": "Message",
+     "x": 596,
+     "y": 374
+    },
+    {
+     "text": "Could you let me know where my order is and when it is expected to arrive?",
+     "x": 595,
+     "y": 409
+    },
+    {
+     "text": "We received your message and are checking the order details.",
+     "x": 595,
+     "y": 450
+    },
+    {
+     "text": "The parcel reached the regional hub and is on track for delivery on 26 May.",
+     "x": 595,
+     "y": 491
+    },
+    {
+     "text": "Thanks for the update.",
+     "x": 595,
+     "y": 532
+    },
+    {
+     "text": "Product",
+     "x": 1442,
+     "y": 380
+    },
+    {
+     "text": "Status",
+     "x": 1442,
+     "y": 413
+    },
+    {
+     "text": "Carrier",
+     "x": 1441,
+     "y": 445
+    },
+    {
+     "text": "Tracking",
+     "x": 1441,
+     "y": 478
+    },
+    {
+     "text": "Expected",
+     "x": 1442,
+     "y": 510
+    },
+    {
+     "text": "Assigned agent",
+     "x": 1441,
+     "y": 543
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 590
+    },
+    {
+     "text": "22 May",
+     "x": 1464,
+     "y": 614
+    },
+    {
+     "text": "Running shoes",
+     "x": 1557,
+     "y": 381
+    },
+    {
+     "text": "In transit",
+     "x": 1557,
+     "y": 414
+    },
+    {
+     "text": "SwiftShip",
+     "x": 1557,
+     "y": 446
+    },
+    {
+     "text": "SWF-884103",
+     "x": 1557,
+     "y": 479
+    },
+    {
+     "text": "26 May 2026",
+     "x": 1557,
+     "y": 511
+    },
+    {
+     "text": "Maya Chen",
+     "x": 1558,
+     "y": 544
+    },
+    {
+     "text": "Order confirmed",
+     "x": 1464,
+     "y": 629
+    },
+    {
+     "text": "23 May",
+     "x": 1464,
+     "y": 659
+    },
+    {
+     "text": "Dispatched",
+     "x": 1465,
+     "y": 674
+    },
+    {
+     "text": "24 May 07:46",
+     "x": 1464,
+     "y": 704
+    },
+    {
+     "text": "Reached regional hub",
+     "x": 1465,
+     "y": 719
+    },
+    {
+     "text": "24 May 08:15",
+     "x": 1464,
+     "y": 749
+    },
+    {
+     "text": "In transit",
+     "x": 1465,
+     "y": 764
+    },
+    {
+     "text": "26 May",
+     "x": 1464,
+     "y": 794
+    },
+    {
+     "text": "Delivery expected",
+     "x": 1465,
+     "y": 809
+    }
+   ],
+   "path": "evidence/images/support_ticket_console_20260524.png",
+   "sha256": "542b7aec17e6b2f38827896e7eb52c70e4bfaaca22433621be1f80f54884e944"
+  },
+  "evidence_32": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Overview",
+     "x": 53,
+     "y": 101
+    },
+    {
+     "text": "Recovery Manager",
+     "x": 54,
+     "y": 146
+    },
+    {
+     "text": "Customer platforms",
+     "x": 53,
+     "y": 191
+    },
+    {
+     "text": "Restore requests",
+     "x": 54,
+     "y": 236
+    },
+    {
+     "text": "Infrastructure",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "Reports",
+     "x": 54,
+     "y": 326
+    },
+    {
+     "text": "Vault Recovery Manager",
+     "x": 22,
+     "y": 1072
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1089
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1105
+    },
+    {
+     "text": "Vault Recovery Manager",
+     "x": 244,
+     "y": 23
+    },
+    {
+     "text": "p Search archives, accounts or restore requests...",
+     "x": 468,
+     "y": 23
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "VR",
+     "x": 1755,
+     "y": 24
+    },
+    {
+     "text": "Northstar Shop I Vault Recovery Manager / Recovery Manager",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Customer-platform archives",
+     "x": 247,
+     "y": 105
+    },
+    {
+     "text": "Healthy",
+     "x": 585,
+     "y": 107
+    },
+    {
+     "text": "Northstar Production weekly snapshots",
+     "x": 247,
+     "y": 138
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "Archives",
+     "x": 248,
+     "y": 178
+    },
+    {
+     "text": "Recent restores",
+     "x": 329,
+     "y": 179
+    },
+    {
+     "text": "Service health",
+     "x": 259,
+     "y": 234
+    },
+    {
+     "text": "Healthy",
+     "x": 260,
+     "y": 254
+    },
+    {
+     "text": "Archives",
+     "x": 261,
+     "y": 333
+    },
+    {
+     "text": "Archive ID",
+     "x": 258,
+     "y": 374
+    },
+    {
+     "text": "backup_92gI",
+     "x": 284,
+     "y": 410
+    },
+    {
+     "text": "backup_928B",
+     "x": 284,
+     "y": 451
+    },
+    {
+     "text": "backup_g287",
+     "x": 284,
+     "y": 492
+    },
+    {
+     "text": "backup_9286",
+     "x": 284,
+     "y": 533
+    },
+    {
+     "text": "Infrastructure health",
+     "x": 446,
+     "y": 178
+    },
+    {
+     "text": "bluepeakco@outlook.com",
+     "x": 454,
+     "y": 409
+    },
+    {
+     "text": "miller.logistics@company.com",
+     "x": 454,
+     "y": 450
+    },
+    {
+     "text": "areed1433@gmaiI.com",
+     "x": 454,
+     "y": 491
+    },
+    {
+     "text": "summit-retail@company.com",
+     "x": 454,
+     "y": 532
+    },
+    {
+     "text": "Storage growth",
+     "x": 644,
+     "y": 234
+    },
+    {
+     "text": "+12.4%",
+     "x": 645,
+     "y": 255
+    },
+    {
+     "text": "Region",
+     "x": 752,
+     "y": 374
+    },
+    {
+     "text": "ap-southeast-l",
+     "x": 752,
+     "y": 409
+    },
+    {
+     "text": "us-west",
+     "x": 752,
+     "y": 451
+    },
+    {
+     "text": "eu-west",
+     "x": 752,
+     "y": 492
+    },
+    {
+     "text": "us-east",
+     "x": 752,
+     "y": 533
+    },
+    {
+     "text": "26 Apr 02:00",
+     "x": 921,
+     "y": 409
+    },
+    {
+     "text": "26 Apr 02:00",
+     "x": 921,
+     "y": 450
+    },
+    {
+     "text": "26 Apr 02:00",
+     "x": 921,
+     "y": 491
+    },
+    {
+     "text": "26 Apr 02:00",
+     "x": 921,
+     "y": 532
+    },
+    {
+     "text": "Restore success",
+     "x": 1030,
+     "y": 235
+    },
+    {
+     "text": "99.6%",
+     "x": 1030,
+     "y": 255
+    },
+    {
+     "text": "Size",
+     "x": 1073,
+     "y": 374
+    },
+    {
+     "text": "102.3 GB",
+     "x": 1073,
+     "y": 409
+    },
+    {
+     "text": "67.1 GB",
+     "x": 1073,
+     "y": 450
+    },
+    {
+     "text": "84.7 GB",
+     "x": 1073,
+     "y": 491
+    },
+    {
+     "text": "91.4 GB",
+     "x": 1073,
+     "y": 532
+    },
+    {
+     "text": "Updated moments ago 4 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Encryption",
+     "x": 1187,
+     "y": 374
+    },
+    {
+     "text": "AES-256",
+     "x": 1187,
+     "y": 409
+    },
+    {
+     "text": "AES-256",
+     "x": 1187,
+     "y": 450
+    },
+    {
+     "text": "AES-256",
+     "x": 1187,
+     "y": 491
+    },
+    {
+     "text": "AES-256",
+     "x": 1187,
+     "y": 532
+    },
+    {
+     "text": "Tier",
+     "x": 1321,
+     "y": 374
+    },
+    {
+     "text": "Archive",
+     "x": 1321,
+     "y": 409
+    },
+    {
+     "text": "Archive",
+     "x": 1321,
+     "y": 450
+    },
+    {
+     "text": "Archive",
+     "x": 1321,
+     "y": 491
+    },
+    {
+     "text": "Archive",
+     "x": 1321,
+     "y": 532
+    },
+    {
+     "text": "Stored",
+     "x": 1414,
+     "y": 234
+    },
+    {
+     "text": "1.35 PB",
+     "x": 1415,
+     "y": 255
+    },
+    {
+     "text": "backup_9287",
+     "x": 1442,
+     "y": 333
+    },
+    {
+     "text": "Account",
+     "x": 1441,
+     "y": 381
+    },
+    {
+     "text": "Path",
+     "x": 1442,
+     "y": 413
+    },
+    {
+     "text": "Region",
+     "x": 1442,
+     "y": 476
+    },
+    {
+     "text": "Created",
+     "x": 1441,
+     "y": 509
+    },
+    {
+     "text": "Encryption",
+     "x": 1442,
+     "y": 541
+    },
+    {
+     "text": "Checksum",
+     "x": 1441,
+     "y": 574
+    },
+    {
+     "text": "Last drill",
+     "x": 1442,
+     "y": 606
+    },
+    {
+     "text": "Retention end",
+     "x": 1442,
+     "y": 639
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 686
+    },
+    {
+     "text": "25 Apr",
+     "x": 1464,
+     "y": 710
+    },
+    {
+     "text": "areed1433@gmaiI.com",
+     "x": 1557,
+     "y": 381
+    },
+    {
+     "text": "s 3 ://northstar-backups/customer-",
+     "x": 1557,
+     "y": 414
+    },
+    {
+     "text": "platform/weekIy/segment-42-",
+     "x": 1557,
+     "y": 429
+    },
+    {
+     "text": "20260426.tar.zst",
+     "x": 1557,
+     "y": 445
+    },
+    {
+     "text": "eu -west-I",
+     "x": 1557,
+     "y": 478
+    },
+    {
+     "text": "26 Apr 2026 02:00 LITC",
+     "x": 1557,
+     "y": 510
+    },
+    {
+     "text": "AES-256",
+     "x": 1557,
+     "y": 542
+    },
+    {
+     "text": "29 Mar 2026",
+     "x": 1557,
+     "y": 607
+    },
+    {
+     "text": "26 Jul 2026",
+     "x": 1557,
+     "y": 640
+    },
+    {
+     "text": "backup_9286 restored \u0007 Completed",
+     "x": 1465,
+     "y": 725
+    },
+    {
+     "text": "24 Apr",
+     "x": 1464,
+     "y": 755
+    },
+    {
+     "text": "backup_9281 restored \u0007 Completed",
+     "x": 1465,
+     "y": 770
+    },
+    {
+     "text": "22 Apr",
+     "x": 1464,
+     "y": 800
+    },
+    {
+     "text": "checksum verification Completed",
+     "x": 1464,
+     "y": 815
+    }
+   ],
+   "path": "evidence/images/backup_restore_console_20260429.png",
+   "sha256": "2c246aa5843bec609b9ddfdf1154cd81e0fd61996f83954735e9856e48c18bf3"
+  },
+  "evidence_37": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Overview",
+     "x": 53,
+     "y": 101
+    },
+    {
+     "text": "Threats",
+     "x": 53,
+     "y": 146
+    },
+    {
+     "text": "Account events",
+     "x": 53,
+     "y": 191
+    },
+    {
+     "text": "Audit logs",
+     "x": 53,
+     "y": 236
+    },
+    {
+     "text": "Detections",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "Investigations",
+     "x": 54,
+     "y": 326
+    },
+    {
+     "text": "Reports",
+     "x": 54,
+     "y": 371
+    },
+    {
+     "text": "Sentinel",
+     "x": 22,
+     "y": 1022
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1038
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1055
+    },
+    {
+     "text": "Sentinel",
+     "x": 244,
+     "y": 23
+    },
+    {
+     "text": "D",
+     "x": 469,
+     "y": 25
+    },
+    {
+     "text": "Search events, users, IP addresses or references...",
+     "x": 491,
+     "y": 23
+    },
+    {
+     "text": "Northstar Shop I Sentinel I Account events",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Account events",
+     "x": 246,
+     "y": 106
+    },
+    {
+     "text": "Subject filter: user_03 18-26 Aug 2026 UTC",
+     "x": 247,
+     "y": 138
+    },
+    {
+     "text": "6 signed events",
+     "x": 543,
+     "y": 108
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 24
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 24
+    },
+    {
+     "text": "Actions",
+     "x": 1723,
+     "y": 111
+    },
+    {
+     "text": "Timeline",
+     "x": 338,
+     "y": 178
+    },
+    {
+     "text": "Events",
+     "x": 260,
+     "y": 235
+    },
+    {
+     "text": "6",
+     "x": 260,
+     "y": 254
+    },
+    {
+     "text": "Events (6)",
+     "x": 262,
+     "y": 333
+    },
+    {
+     "text": "Time (UTC)",
+     "x": 258,
+     "y": 374
+    },
+    {
+     "text": "25 Aug 04:03",
+     "x": 283,
+     "y": 410
+    },
+    {
+     "text": "25 Aug 03:21",
+     "x": 283,
+     "y": 451
+    },
+    {
+     "text": "24 Aug 16:14",
+     "x": 283,
+     "y": 492
+    },
+    {
+     "text": "22 Aug 11:27",
+     "x": 283,
+     "y": 533
+    },
+    {
+     "text": "20 Aug 09:42",
+     "x": 283,
+     "y": 574
+    },
+    {
+     "text": "18 Aug 14:05",
+     "x": 283,
+     "y": 615
+    },
+    {
+     "text": "Integrity",
+     "x": 414,
+     "y": 179
+    },
+    {
+     "text": "Account closure recorded",
+     "x": 427,
+     "y": 409
+    },
+    {
+     "text": "Session revoked",
+     "x": 427,
+     "y": 450
+    },
+    {
+     "text": "Recovery challenge completed",
+     "x": 427,
+     "y": 491
+    },
+    {
+     "text": "Email change confirmed",
+     "x": 427,
+     "y": 532
+    },
+    {
+     "text": "Login from new device",
+     "x": 427,
+     "y": 573
+    },
+    {
+     "text": "Password changed",
+     "x": 427,
+     "y": 614
+    },
+    {
+     "text": "Categories",
+     "x": 644,
+     "y": 234
+    },
+    {
+     "text": "5",
+     "x": 645,
+     "y": 255
+    },
+    {
+     "text": "Category",
+     "x": 689,
+     "y": 374
+    },
+    {
+     "text": "Account lifecycle",
+     "x": 689,
+     "y": 409
+    },
+    {
+     "text": "Session management",
+     "x": 689,
+     "y": 450
+    },
+    {
+     "text": "Authentication",
+     "x": 689,
+     "y": 491
+    },
+    {
+     "text": "Profile update",
+     "x": 690,
+     "y": 532
+    },
+    {
+     "text": "Authentication",
+     "x": 689,
+     "y": 573
+    },
+    {
+     "text": "Authentication",
+     "x": 689,
+     "y": 614
+    },
+    {
+     "text": "Subject",
+     "x": 881,
+     "y": 374
+    },
+    {
+     "text": "user_03",
+     "x": 881,
+     "y": 409
+    },
+    {
+     "text": "user_03",
+     "x": 881,
+     "y": 450
+    },
+    {
+     "text": "user_03",
+     "x": 881,
+     "y": 491
+    },
+    {
+     "text": "user_03",
+     "x": 881,
+     "y": 532
+    },
+    {
+     "text": "user_03",
+     "x": 881,
+     "y": 573
+    },
+    {
+     "text": "user_03",
+     "x": 881,
+     "y": 614
+    },
+    {
+     "text": "Integrity failures",
+     "x": 1030,
+     "y": 234
+    },
+    {
+     "text": "Automated workflow",
+     "x": 973,
+     "y": 409
+    },
+    {
+     "text": "Security system",
+     "x": 973,
+     "y": 450
+    },
+    {
+     "text": "user (self)",
+     "x": 973,
+     "y": 491
+    },
+    {
+     "text": "user (self)",
+     "x": 973,
+     "y": 532
+    },
+    {
+     "text": "user (self)",
+     "x": 973,
+     "y": 573
+    },
+    {
+     "text": "user (self)",
+     "x": 973,
+     "y": 614
+    },
+    {
+     "text": "Partition",
+     "x": 1415,
+     "y": 234
+    },
+    {
+     "text": "2026-Q3",
+     "x": 1415,
+     "y": 254
+    },
+    {
+     "text": "audit_record_003",
+     "x": 1441,
+     "y": 333
+    },
+    {
+     "text": "event_type",
+     "x": 1441,
+     "y": 381
+    },
+    {
+     "text": "subject",
+     "x": 1441,
+     "y": 413
+    },
+    {
+     "text": "actor",
+     "x": 1441,
+     "y": 446
+    },
+    {
+     "text": "recorded_at",
+     "x": 1441,
+     "y": 478
+    },
+    {
+     "text": "fingerprint",
+     "x": 1441,
+     "y": 510
+    },
+    {
+     "text": "signature",
+     "x": 1441,
+     "y": 543
+    },
+    {
+     "text": "journal",
+     "x": 1441,
+     "y": 575
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 623
+    },
+    {
+     "text": "25 Aug",
+     "x": 1464,
+     "y": 647
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "\u0007 Raw event",
+     "x": 1561,
+     "y": 334
+    },
+    {
+     "text": "Integrity",
+     "x": 1159,
+     "y": 374
+    },
+    {
+     "text": "Valid",
+     "x": 1158,
+     "y": 409
+    },
+    {
+     "text": "Valid",
+     "x": 1158,
+     "y": 450
+    },
+    {
+     "text": "Valid",
+     "x": 1158,
+     "y": 491
+    },
+    {
+     "text": "Valid",
+     "x": 1158,
+     "y": 532
+    },
+    {
+     "text": "Valid",
+     "x": 1158,
+     "y": 573
+    },
+    {
+     "text": "Valid",
+     "x": 1158,
+     "y": 614
+    },
+    {
+     "text": "Updated moments ago 6 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Reference",
+     "x": 1257,
+     "y": 374
+    },
+    {
+     "text": "aud",
+     "x": 1256,
+     "y": 409
+    },
+    {
+     "text": "aud",
+     "x": 1256,
+     "y": 450
+    },
+    {
+     "text": "aud it_reco I",
+     "x": 1256,
+     "y": 491
+    },
+    {
+     "text": "aud",
+     "x": 1256,
+     "y": 532
+    },
+    {
+     "text": "aud",
+     "x": 1256,
+     "y": 573
+    },
+    {
+     "text": "automated account workflow",
+     "x": 1557,
+     "y": 446
+    },
+    {
+     "text": "8f0cm31ad",
+     "x": 1557,
+     "y": 511
+    },
+    {
+     "text": "2026-03",
+     "x": 1557,
+     "y": 576
+    },
+    {
+     "text": "Account closure recorded",
+     "x": 1464,
+     "y": 662
+    },
+    {
+     "text": "25 Aug",
+     "x": 1464,
+     "y": 692
+    },
+    {
+     "text": "Session revoked",
+     "x": 1464,
+     "y": 707
+    },
+    {
+     "text": "24 Aug",
+     "x": 1464,
+     "y": 737
+    },
+    {
+     "text": "Recovery challenge completed",
+     "x": 1465,
+     "y": 752
+    },
+    {
+     "text": "22 Aug",
+     "x": 1464,
+     "y": 782
+    },
+    {
+     "text": "Email change confirmed",
+     "x": 1465,
+     "y": 797
+    }
+   ],
+   "path": "evidence/images/security_audit_explorer_20260905.png",
+   "sha256": "ca59f693f4e7002466b3fdeaf1bb6763618770963dd811b60003772d07b4b03b"
+  },
+  "evidence_42": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Home",
+     "x": 54,
+     "y": 101
+    },
+    {
+     "text": "Customer references",
+     "x": 53,
+     "y": 146
+    },
+    {
+     "text": "Orders",
+     "x": 53,
+     "y": 191
+    },
+    {
+     "text": "Support",
+     "x": 53,
+     "y": 236
+    },
+    {
+     "text": "Finance",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "Data management",
+     "x": 54,
+     "y": 326
+    },
+    {
+     "text": "Reports",
+     "x": 54,
+     "y": 371
+    },
+    {
+     "text": "Customer Reference Registry",
+     "x": 22,
+     "y": 1022
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1038
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1055
+    },
+    {
+     "text": "Customer Reference",
+     "x": 244,
+     "y": 15
+    },
+    {
+     "text": "p Search references, orders, support cases or finance records...",
+     "x": 468,
+     "y": 23
+    },
+    {
+     "text": "Registry",
+     "x": 245,
+     "y": 32
+    },
+    {
+     "text": "Northstar Shop I Customer Reference Registry I Customer references",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "user 17",
+     "x": 247,
+     "y": 106
+    },
+    {
+     "text": "Customer key Account Platform eLAvest",
+     "x": 246,
+     "y": 138
+    },
+    {
+     "text": "Retained reference",
+     "x": 528,
+     "y": 107
+    },
+    {
+     "text": "Overview",
+     "x": 248,
+     "y": 178
+    },
+    {
+     "text": "Linked records",
+     "x": 332,
+     "y": 178
+    },
+    {
+     "text": "History",
+     "x": 444,
+     "y": 179
+    },
+    {
+     "text": "Record reference",
+     "x": 456,
+     "y": 374
+    },
+    {
+     "text": "ORD-20263245",
+     "x": 456,
+     "y": 409
+    },
+    {
+     "text": "CS-3245",
+     "x": 456,
+     "y": 450
+    },
+    {
+     "text": "CS-3378",
+     "x": 456,
+     "y": 491
+    },
+    {
+     "text": "FIN-7742",
+     "x": 456,
+     "y": 532
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Owner team",
+     "x": 1414,
+     "y": 235
+    },
+    {
+     "text": "Account Platform",
+     "x": 1414,
+     "y": 254
+    },
+    {
+     "text": "Reference type",
+     "x": 260,
+     "y": 234
+    },
+    {
+     "text": "Customer key",
+     "x": 260,
+     "y": 254
+    },
+    {
+     "text": "Overview",
+     "x": 261,
+     "y": 333
+    },
+    {
+     "text": "System",
+     "x": 259,
+     "y": 374
+    },
+    {
+     "text": "Orders",
+     "x": 283,
+     "y": 410
+    },
+    {
+     "text": "Support",
+     "x": 283,
+     "y": 451
+    },
+    {
+     "text": "Support",
+     "x": 283,
+     "y": 492
+    },
+    {
+     "text": "Finance",
+     "x": 284,
+     "y": 533
+    },
+    {
+     "text": "Created",
+     "x": 644,
+     "y": 235
+    },
+    {
+     "text": "11 Jan 2024 08:42 UTC",
+     "x": 645,
+     "y": 255
+    },
+    {
+     "text": "Relationship",
+     "x": 718,
+     "y": 374
+    },
+    {
+     "text": "Linked to customer",
+     "x": 718,
+     "y": 409
+    },
+    {
+     "text": "Linked to customer",
+     "x": 718,
+     "y": 450
+    },
+    {
+     "text": "Linked to customer",
+     "x": 718,
+     "y": 491
+    },
+    {
+     "text": "Linked to customer",
+     "x": 718,
+     "y": 532
+    },
+    {
+     "text": "Most recent update",
+     "x": 1030,
+     "y": 234
+    },
+    {
+     "text": "10 Mar 2026 07:18 UTC",
+     "x": 1030,
+     "y": 255
+    },
+    {
+     "text": "created (UTC)",
+     "x": 993,
+     "y": 374
+    },
+    {
+     "text": "11 Jan 2024 08:45",
+     "x": 993,
+     "y": 409
+    },
+    {
+     "text": "14 Feb 2024 12:16",
+     "x": 993,
+     "y": 450
+    },
+    {
+     "text": "03 Jun 2024 09:27",
+     "x": 993,
+     "y": 491
+    },
+    {
+     "text": "22 Aug 2024 15:03",
+     "x": 994,
+     "y": 532
+    },
+    {
+     "text": "Updated moments ago 4 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Status",
+     "x": 1268,
+     "y": 374
+    },
+    {
+     "text": "Active",
+     "x": 1268,
+     "y": 409
+    },
+    {
+     "text": "Active",
+     "x": 1268,
+     "y": 450
+    },
+    {
+     "text": "Active",
+     "x": 1268,
+     "y": 491
+    },
+    {
+     "text": "Active",
+     "x": 1268,
+     "y": 532
+    },
+    {
+     "text": "History",
+     "x": 1442,
+     "y": 333
+    },
+    {
+     "text": "10 Mar 2026",
+     "x": 1441,
+     "y": 380
+    },
+    {
+     "text": "22 Aug 2024",
+     "x": 1442,
+     "y": 413
+    },
+    {
+     "text": "03 Jun 2024",
+     "x": 1441,
+     "y": 445
+    },
+    {
+     "text": "14 Feb 2024",
+     "x": 1441,
+     "y": 478
+    },
+    {
+     "text": "11 Jan 2024",
+     "x": 1441,
+     "y": 510
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 558
+    },
+    {
+     "text": "Metadata reviewed",
+     "x": 1557,
+     "y": 381
+    },
+    {
+     "text": "Finance link added",
+     "x": 1558,
+     "y": 414
+    },
+    {
+     "text": "Support link added",
+     "x": 1557,
+     "y": 446
+    },
+    {
+     "text": "Support link added",
+     "x": 1557,
+     "y": 479
+    },
+    {
+     "text": "Reference created",
+     "x": 1557,
+     "y": 511
+    },
+    {
+     "text": "Reference created",
+     "x": 1465,
+     "y": 582
+    },
+    {
+     "text": "Recorded",
+     "x": 1465,
+     "y": 597
+    },
+    {
+     "text": "Order link added",
+     "x": 1464,
+     "y": 627
+    },
+    {
+     "text": "00-20263246",
+     "x": 1464,
+     "y": 642
+    },
+    {
+     "text": "Support links added",
+     "x": 1464,
+     "y": 672
+    },
+    {
+     "text": "cs-324S, cs.3378",
+     "x": 1464,
+     "y": 687
+    },
+    {
+     "text": "Finance link added",
+     "x": 1465,
+     "y": 717
+    },
+    {
+     "text": "FIN-7742",
+     "x": 1465,
+     "y": 732
+    },
+    {
+     "text": "Metadata reviewed",
+     "x": 1465,
+     "y": 762
+    },
+    {
+     "text": "Recorded",
+     "x": 1465,
+     "y": 777
+    }
+   ],
+   "path": "evidence/images/deleted_account_reference_20260310.png",
+   "sha256": "68c28a72afd6ed184d5990d15c543f8a516face204f0360f732755a8a63c28be"
+  },
+  "evidence_46": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Buckets",
+     "x": 54,
+     "y": 101
+    },
+    {
+     "text": "Access policies",
+     "x": 53,
+     "y": 146
+    },
+    {
+     "text": "Monitoring",
+     "x": 54,
+     "y": 191
+    },
+    {
+     "text": "Settings",
+     "x": 53,
+     "y": 236
+    },
+    {
+     "text": "northstar-assets",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "northstar-customer-",
+     "x": 53,
+     "y": 318
+    },
+    {
+     "text": "northstar-logs",
+     "x": 54,
+     "y": 371
+    },
+    {
+     "text": "Nimbus Object Storage",
+     "x": 23,
+     "y": 1072
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 1089
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 1105
+    },
+    {
+     "text": "Nimbus Object Storage",
+     "x": 245,
+     "y": 23
+    },
+    {
+     "text": "p Search objects by name or prefix...",
+     "x": 468,
+     "y": 23
+    },
+    {
+     "text": "Production",
+     "x": 1637,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1656,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1711,
+     "y": 23
+    },
+    {
+     "text": "NO",
+     "x": 1754,
+     "y": 24
+    },
+    {
+     "text": "Northstar Shop I Nimbus Object Storage I northstar-customer-data",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "northstar-customer-data",
+     "x": 247,
+     "y": 106
+    },
+    {
+     "text": "8 objects",
+     "x": 551,
+     "y": 107
+    },
+    {
+     "text": "eu-west-l I support-attachments / 2026 / 02",
+     "x": 246,
+     "y": 138
+    },
+    {
+     "text": "Captured",
+     "x": 1029,
+     "y": 235
+    },
+    {
+     "text": "13 Feb 2026 08:00 UTC",
+     "x": 1030,
+     "y": 254
+    },
+    {
+     "text": "Storage class",
+     "x": 1086,
+     "y": 374
+    },
+    {
+     "text": "Standard",
+     "x": 1086,
+     "y": 409
+    },
+    {
+     "text": "Standard",
+     "x": 1086,
+     "y": 450
+    },
+    {
+     "text": "Standard",
+     "x": 1086,
+     "y": 491
+    },
+    {
+     "text": "Standard",
+     "x": 1086,
+     "y": 532
+    },
+    {
+     "text": "Standard",
+     "x": 1086,
+     "y": 573
+    },
+    {
+     "text": "Standard",
+     "x": 1086,
+     "y": 614
+    },
+    {
+     "text": "Standard",
+     "x": 1086,
+     "y": 655
+    },
+    {
+     "text": "Standard",
+     "x": 1086,
+     "y": 696
+    },
+    {
+     "text": "Filter",
+     "x": 1595,
+     "y": 111
+    },
+    {
+     "text": "Storage class",
+     "x": 1414,
+     "y": 235
+    },
+    {
+     "text": "delivery_confirmation_19.pdf",
+     "x": 1441,
+     "y": 333
+    },
+    {
+     "text": "Actions",
+     "x": 1724,
+     "y": 111
+    },
+    {
+     "text": "Objects",
+     "x": 248,
+     "y": 178
+    },
+    {
+     "text": "Account",
+     "x": 259,
+     "y": 235
+    },
+    {
+     "text": "Versions",
+     "x": 322,
+     "y": 178
+    },
+    {
+     "text": "Access",
+     "x": 399,
+     "y": 179
+    },
+    {
+     "text": "Northstar Production",
+     "x": 260,
+     "y": 254
+    },
+    {
+     "text": "Objects",
+     "x": 261,
+     "y": 333
+    },
+    {
+     "text": "Name",
+     "x": 259,
+     "y": 374
+    },
+    {
+     "text": "pdf",
+     "x": 422,
+     "y": 410
+    },
+    {
+     "text": "delivery_confirmation_ 20. pdf",
+     "x": 283,
+     "y": 451
+    },
+    {
+     "text": "invoice_NS-10493.pdf",
+     "x": 284,
+     "y": 574
+    },
+    {
+     "text": "Region",
+     "x": 645,
+     "y": 234
+    },
+    {
+     "text": "eu-west-l",
+     "x": 644,
+     "y": 255
+    },
+    {
+     "text": "Size",
+     "x": 734,
+     "y": 374
+    },
+    {
+     "text": "684 KB",
+     "x": 734,
+     "y": 409
+    },
+    {
+     "text": "712 KB",
+     "x": 733,
+     "y": 450
+    },
+    {
+     "text": "203 KB",
+     "x": 734,
+     "y": 491
+    },
+    {
+     "text": "198 KB",
+     "x": 734,
+     "y": 532
+    },
+    {
+     "text": "318 KB",
+     "x": 734,
+     "y": 573
+    },
+    {
+     "text": "2.4 MB",
+     "x": 734,
+     "y": 614
+    },
+    {
+     "text": "128 MB",
+     "x": 734,
+     "y": 655
+    },
+    {
+     "text": "131 MB",
+     "x": 734,
+     "y": 696
+    },
+    {
+     "text": "Updated moments ago 8 records",
+     "x": 1221,
+     "y": 334
+    },
+    {
+     "text": "Version",
+     "x": 1289,
+     "y": 374
+    },
+    {
+     "text": "Modified (UTC)",
+     "x": 863,
+     "y": 374
+    },
+    {
+     "text": "12 Feb 18:42",
+     "x": 862,
+     "y": 409
+    },
+    {
+     "text": "11 Feb 14:17",
+     "x": 862,
+     "y": 450
+    },
+    {
+     "text": "10 Feb 09:33",
+     "x": 862,
+     "y": 491
+    },
+    {
+     "text": "11 Feb 16:05",
+     "x": 862,
+     "y": 532
+    },
+    {
+     "text": "10 Feb 11:21",
+     "x": 862,
+     "y": 573
+    },
+    {
+     "text": "12 Feb 10:08",
+     "x": 862,
+     "y": 614
+    },
+    {
+     "text": "10 Feb 23:14",
+     "x": 862,
+     "y": 655
+    },
+    {
+     "text": "12 Feb 21:56",
+     "x": 862,
+     "y": 696
+    },
+    {
+     "text": "Size",
+     "x": 1442,
+     "y": 380
+    },
+    {
+     "text": "Version",
+     "x": 1441,
+     "y": 413
+    },
+    {
+     "text": "Content type",
+     "x": 1441,
+     "y": 445
+    },
+    {
+     "text": "Encryption",
+     "x": 1442,
+     "y": 478
+    },
+    {
+     "text": "Checksum",
+     "x": 1441,
+     "y": 510
+    },
+    {
+     "text": "Uploader",
+     "x": 1442,
+     "y": 543
+    },
+    {
+     "text": "Modified",
+     "x": 1442,
+     "y": 575
+    },
+    {
+     "text": "Activity",
+     "x": 1442,
+     "y": 623
+    },
+    {
+     "text": "684 KB",
+     "x": 1557,
+     "y": 381
+    },
+    {
+     "text": "v3",
+     "x": 1557,
+     "y": 414
+    },
+    {
+     "text": "application/pdf",
+     "x": 1557,
+     "y": 446
+    },
+    {
+     "text": "AES-256",
+     "x": 1557,
+     "y": 479
+    },
+    {
+     "text": "e71b6dm",
+     "x": 1557,
+     "y": 511
+    },
+    {
+     "text": "support-service",
+     "x": 1557,
+     "y": 544
+    },
+    {
+     "text": "12 Feb 2026 18:42 UTC",
+     "x": 1557,
+     "y": 576
+    },
+    {
+     "text": "12 Feb 18:42 \u0007 metadata update",
+     "x": 1464,
+     "y": 662
+    },
+    {
+     "text": "12 Feb 18:39 upload complete",
+     "x": 1464,
+     "y": 707
+    },
+    {
+     "text": "12 Feb 18:38 object created",
+     "x": 1464,
+     "y": 752
+    }
+   ],
+   "path": "evidence/images/object_storage_browser_20260213.png",
+   "sha256": "96e9a191380c29b9e0ab997007268c4cd6353cb6721ebd1ed4a32599d8d37e04"
+  },
+  "evidence_60": {
+   "lines": [
+    {
+     "text": "Northstar Shop",
+     "x": 58,
+     "y": 28
+    },
+    {
+     "text": "Home",
+     "x": 54,
+     "y": 101
+    },
+    {
+     "text": "Audience Operations",
+     "x": 53,
+     "y": 146
+    },
+    {
+     "text": "Campaigns",
+     "x": 53,
+     "y": 191
+    },
+    {
+     "text": "Journeys",
+     "x": 53,
+     "y": 236
+    },
+    {
+     "text": "Products",
+     "x": 54,
+     "y": 281
+    },
+    {
+     "text": "Analytics",
+     "x": 53,
+     "y": 326
+    },
+    {
+     "text": "Data",
+     "x": 54,
+     "y": 371
+    },
+    {
+     "text": "Settings",
+     "x": 53,
+     "y": 416
+    },
+    {
+     "text": "Audience Operations",
+     "x": 22,
+     "y": 842
+    },
+    {
+     "text": "Production workspace",
+     "x": 23,
+     "y": 858
+    },
+    {
+     "text": "build 2026.10.4",
+     "x": 23,
+     "y": 875
+    },
+    {
+     "text": "Audience Operations",
+     "x": 244,
+     "y": 23
+    },
+    {
+     "text": "p Search customers, audiences, campaigns...",
+     "x": 468,
+     "y": 23
+    },
+    {
+     "text": "Production",
+     "x": 1337,
+     "y": 23
+    },
+    {
+     "text": "Export",
+     "x": 1356,
+     "y": 111
+    },
+    {
+     "text": "Help",
+     "x": 1411,
+     "y": 23
+    },
+    {
+     "text": "AO",
+     "x": 1454,
+     "y": 24
+    },
+    {
+     "text": "Northstar Shop / Audience Operations / Audience Operations",
+     "x": 247,
+     "y": 82
+    },
+    {
+     "text": "Soo-jin Park",
+     "x": 247,
+     "y": 105
+    },
+    {
+     "text": "marketing_001 sj.park@naver.com +8210-5837-9451",
+     "x": 247,
+     "y": 138
+    },
+    {
+     "text": "Live",
+     "x": 611,
+     "y": 107
+    },
+    {
+     "text": "Filter",
+     "x": 1295,
+     "y": 111
+    },
+    {
+     "text": "Last refreshed",
+     "x": 1252,
+     "y": 234
+    },
+    {
+     "text": "Actions",
+     "x": 1424,
+     "y": 111
+    },
+    {
+     "text": "Profile",
+     "x": 249,
+     "y": 178
+    },
+    {
+     "text": "Market",
+     "x": 260,
+     "y": 234
+    },
+    {
+     "text": "Attributes",
+     "x": 315,
+     "y": 178
+    },
+    {
+     "text": "Memberships",
+     "x": 400,
+     "y": 178
+    },
+    {
+     "text": "Activity",
+     "x": 412,
+     "y": 374
+    },
+    {
+     "text": "Activity",
+     "x": 503,
+     "y": 178
+    },
+    {
+     "text": "Language",
+     "x": 508,
+     "y": 235
+    },
+    {
+     "text": "Korean",
+     "x": 508,
+     "y": 255
+    },
+    {
+     "text": "South Korea",
+     "x": 260,
+     "y": 254
+    },
+    {
+     "text": "Profile",
+     "x": 262,
+     "y": 333
+    },
+    {
+     "text": "Time",
+     "x": 258,
+     "y": 374
+    },
+    {
+     "text": "23:40",
+     "x": 284,
+     "y": 410
+    },
+    {
+     "text": "23:38",
+     "x": 284,
+     "y": 451
+    },
+    {
+     "text": "23:35",
+     "x": 284,
+     "y": 492
+    },
+    {
+     "text": "23:32",
+     "x": 284,
+     "y": 533
+    },
+    {
+     "text": "Email opt-in",
+     "x": 756,
+     "y": 234
+    },
+    {
+     "text": "Yes",
+     "x": 755,
+     "y": 255
+    },
+    {
+     "text": "Detail",
+     "x": 732,
+     "y": 374
+    },
+    {
+     "text": "Desk accessories \u0007 Drinkware",
+     "x": 732,
+     "y": 409
+    },
+    {
+     "text": "Autumn Offers \u0007 Eligible",
+     "x": 731,
+     "y": 450
+    },
+    {
+     "text": "Live profile fields updated",
+     "x": 732,
+     "y": 491
+    },
+    {
+     "text": "Returning Customers -",
+     "x": 732,
+     "y": 532
+    },
+    {
+     "text": "East Asia",
+     "x": 862,
+     "y": 532
+    },
+    {
+     "text": "SMS opt-in",
+     "x": 1003,
+     "y": 234
+    },
+    {
+     "text": "No",
+     "x": 1004,
+     "y": 255
+    },
+    {
+     "text": "Updated moments ago 4 records",
+     "x": 921,
+     "y": 334
+    },
+    {
+     "text": "15 sep 2026 23:40 UTC",
+     "x": 1252,
+     "y": 255
+    },
+    {
+     "text": "Audience membership",
+     "x": 1141,
+     "y": 333
+    },
+    {
+     "text": "Product-category update",
+     "x": 413,
+     "y": 409
+    },
+    {
+     "text": "Campaign eligibility check",
+     "x": 412,
+     "y": 450
+    },
+    {
+     "text": "Profile refresh",
+     "x": 413,
+     "y": 491
+    },
+    {
+     "text": "Audience evaluation",
+     "x": 412,
+     "y": 532
+    },
+    {
+     "text": "Audience",
+     "x": 1141,
+     "y": 380
+    },
+    {
+     "text": "Segments",
+     "x": 1142,
+     "y": 413
+    },
+    {
+     "text": "Preferred",
+     "x": 1142,
+     "y": 461
+    },
+    {
+     "text": "categories",
+     "x": 1141,
+     "y": 474
+    },
+    {
+     "text": "Last campaign",
+     "x": 1142,
+     "y": 504
+    },
+    {
+     "text": "Open rate",
+     "x": 1141,
+     "y": 536
+    },
+    {
+     "text": "Click rate",
+     "x": 1141,
+     "y": 569
+    },
+    {
+     "text": "Activity",
+     "x": 1142,
+     "y": 616
+    },
+    {
+     "text": "Returning customers - East Asia",
+     "x": 1257,
+     "y": 381
+    },
+    {
+     "text": "Repeat customer \u0007 Home & lifestyle",
+     "x": 1258,
+     "y": 414
+    },
+    {
+     "text": "\u0007 Mobile shopper",
+     "x": 1258,
+     "y": 429
+    },
+    {
+     "text": "Desk accessories \u0007 Drinkware",
+     "x": 1258,
+     "y": 462
+    },
+    {
+     "text": "ALJtumn Offers",
+     "x": 1257,
+     "y": 505
+    },
+    {
+     "text": "32.4%",
+     "x": 1257,
+     "y": 537
+    },
+    {
+     "text": "Autumn offers",
+     "x": 1164,
+     "y": 640
+    },
+    {
+     "text": "32.4% open rate",
+     "x": 1165,
+     "y": 655
+    },
+    {
+     "text": "Home & Lifestyle Picks",
+     "x": 1165,
+     "y": 685
+    },
+    {
+     "text": "28.7% open rate",
+     "x": 1165,
+     "y": 700
+    },
+    {
+     "text": "Profile refreshed from live data",
+     "x": 1165,
+     "y": 730
+    },
+    {
+     "text": "Recorded",
+     "x": 1165,
+     "y": 745
+    }
+   ],
+   "path": "evidence/images/marketing_profile_console.png",
+   "sha256": "51fa0e6a38f8fa3629ba1b0d0b90b4ed139715956b97bfd09a6f1a6232c15df5"
+  }
+ },
+ "tool": "code/tools/ocr_windows.ps1"
+}
