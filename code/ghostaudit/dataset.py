@@ -157,8 +157,27 @@ class Dataset:
         return {f.file_id: f for f in self.evidence_files.rows}
 
 
-def load_dataset(root: os.PathLike) -> Dataset:
+REQUIRED_FILES = ("deletion_requests.csv", "sample_deletion_requests.csv", "user_identities.csv", "user_audit_log.csv",
+                  "system_activity.csv", "deletion_rules.csv", "evidence_files.csv", "sample_output.csv")
+
+
+class DatasetNotFound(FileNotFoundError):
+    """The dataset directory is missing or incomplete; the message says which path was tried and how it was resolved."""
+
+
+def check_dataset_dir(root: os.PathLike) -> Path:
     root = Path(root)
+    absolute = Path(os.path.abspath(root))
+    if not root.is_dir():
+        raise DatasetNotFound(f"dataset directory not found: {absolute} (a relative path is resolved against the current directory, {os.getcwd()})")
+    missing = [n for n in REQUIRED_FILES if not (root / n).is_file()]
+    if missing:
+        raise DatasetNotFound(f"{absolute} is not a complete dataset directory; missing: {', '.join(missing)}")
+    return root
+
+
+def load_dataset(root: os.PathLike) -> Dataset:
+    root = check_dataset_dir(root)
     ds = Dataset(
         root=root,
         requests=_load(root / "deletion_requests.csv", DeletionRequest, ("requested_at", "reported_at", "audit_at"), "case_id"),

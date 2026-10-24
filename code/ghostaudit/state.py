@@ -360,6 +360,9 @@ class StateEvidence:
     reason: str  # "usable" | "file_captured_after_audit" | "record_time_after_audit"
     exposed: Tuple[str, ...] = ()
     ocr: bool = False
+    fmt: str = ""  # source format of the reading (sql/json/log/txt/pdf/image)
+    grounding: Optional[str] = None  # screenshots only: catalog+ocr | catalog_time_only | conflict
+    retention_until: Optional[str] = None  # retained records: end of the retention period, if the record states one
 
 
 @dataclass(frozen=True)
@@ -411,7 +414,9 @@ class StateReconstructor:
                 reason = "file_captured_after_audit"
             else:
                 reason = "record_time_after_audit"
-            ev = StateEvidence(o.file_id, o.locator, rd.state, rd.basis, self._effective(o), o.copy, ok, reason, rd.exposed, bool(dict(rd.detail).get("ocr")))
+            det = dict(rd.detail)
+            ev = StateEvidence(o.file_id, o.locator, rd.state, rd.basis, self._effective(o), o.copy, ok, reason, rd.exposed, bool(det.get("ocr")),
+                               o.fmt, o.fields.get("grounding") if o.fmt == "image" else None, det.get("retention_until"))
             (usable if ok else excluded).append((o, rd, ev) if ok else ev)  # type: ignore[arg-type]
         category = category_of(resource_id)
         notes: List[str] = []

@@ -44,6 +44,18 @@ OPERATION_STATE: Dict[str, str] = {op: st for _, op, st in _OPERATION_TABLE}
 OPERATION_ORDER: Dict[str, int] = {op: i for i, (_, op, _) in enumerate(_OPERATION_TABLE)}
 PHASE_ORDER: Dict[str, int] = {p: i for i, p in enumerate(PHASES)}
 
+# Required treatment (deletion_rules.csv vocabulary) -> the verification operation that proves it was applied.
+VERIFY_FOR_ACTION: Dict[str, str] = {
+    "DELETE": "VERIFY_RECORD_ABSENT", "REDACT": "VERIFY_RECORD_REDACTED", "ANONYMIZE": "VERIFY_RECORD_ANONYMIZED",
+    "RETAIN": "VERIFY_RECORD_PRESENT", "DISABLE": "VERIFY_DATA_FLOW_DISABLED", "BLOCK_RESTORE": "VERIFY_RESTORE_BLOCKED",
+}
+
+# Required treatment -> the remediation operation that applies it.
+REMEDIATE_FOR_ACTION: Dict[str, str] = {
+    "DELETE": "DELETE_RECORD", "REDACT": "REDACT_RECORD", "ANONYMIZE": "ANONYMIZE_RECORD",
+    "DISABLE": "DISABLE_DATA_FLOW", "BLOCK_RESTORE": "BLOCK_RESTORE",
+}
+
 # --------------------------------------------------------------------------- resource ids
 
 # Prefix of a resource id -> the system that owns it. Derived from activity
@@ -125,6 +137,7 @@ def validate_steps(
     steps: Sequence[Dict[str, Any]],
     valid_evidence_ids: Optional[Iterable[str]] = None,
     check_order: bool = True,
+    allow_empty_deletion_steps: bool = False,
 ) -> List[Violation]:
     """Structural validation of one case's steps against the output contract.
 
@@ -146,7 +159,10 @@ def validate_steps(
             add("not_applicable_steps", "NOT_APPLICABLE must have an empty steps array")
         return v
     if not steps:
-        add("empty_steps", f"{status} case must have steps")
+        # The spec only forbids *unsupported* steps; a COMPLETE case with nothing provable may legitimately have none, so callers
+        # that build predictions pass allow_empty_deletion_steps=True and report such cases separately.
+        if not allow_empty_deletion_steps:
+            add("empty_steps", f"{status} case must have steps")
         return v
     known = set(valid_evidence_ids) if valid_evidence_ids is not None else None
     structural_error = False
@@ -206,6 +222,7 @@ def validate_output_rows(
     expected_case_ids: Optional[Sequence[str]] = None,
     valid_evidence_ids: Optional[Iterable[str]] = None,
     check_order: bool = True,
+    allow_empty_deletion_steps: bool = False,
 ) -> List[Violation]:
     """Validate a whole ``output.csv``: coverage, uniqueness, sort order and every row's steps."""
     v: List[Violation] = []
@@ -232,5 +249,5 @@ def validate_output_rows(
         if not isinstance(steps, list):
             v.append(Violation(r["case_id"], "json", "steps_json must be a JSON array"))
             continue
-        v.extend(validate_steps(r["case_id"], r["deletion_status"], steps, evidence, check_order))
+        v.extend(validate_steps(r["case_id"], r["deletion_status"], steps, evidence, check_order, allow_empty_deletion_steps))
     return v
