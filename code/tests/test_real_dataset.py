@@ -39,7 +39,7 @@ class DatasetTables(unittest.TestCase):
         ids = [r.case_id for r in real_dataset().requests.rows]
         self.assertEqual(len(set(ids)), 518)
         self.assertEqual(ids, sorted(ids, key=case_sort_key))
-        self.assertNotEqual(ids, sorted(ids))  # string order would differ -> the ordering decision matters
+        self.assertNotEqual(ids, sorted(ids))  # the input file is in numeric order, not text order: the two readings of "sorted" differ here
 
     def test_multilingual_request_text_decoded_as_utf8(self):
         texts = " ".join(r.request_text for r in real_dataset().requests.rows)

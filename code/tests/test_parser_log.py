@@ -7,42 +7,42 @@ from ghostaudit.parsers.log_parser import LineError, parse_log_line, parse_log_t
 
 # One interleaved-trace fixture per dialect. Each has: a *_started line carrying the subject key,
 # an unrelated interleaved line, and a *_completed line carrying the resource_id.
-LOGFMT = """2026-09-15T11:51:09Z level=DEBUG service=account_service instance=account-6 trace_id=tr-1 event=profile_lookup_started lookup_key="leonie.g9352@outlook.com" attempt=1
+LOGFMT = """2026-09-15T11:51:09Z level=DEBUG service=account_service instance=account-6 trace_id=tr-1 event=profile_lookup_started lookup_key="person3@example.test" attempt=1
 2026-09-15T11:51:10Z level=INFO service=search_service instance=search-1 trace_id=tr-2 resource_id=search_9 event=index_query_completed result=hit
 2026-09-15T11:51:19Z level=INFO service=account_service instance=account-6 trace_id=tr-1 resource_id=account_4092 event=profile_lookup_completed rows=0 http_status=404
 """
-POSLEVEL = """2026-03-15T07:00:00Z INFO service=downstream_delivery_service event=record_lookup seq=1 system="account_service" resource_id="account_022" record_type="USER_PROFILE" result="NOT_FOUND" subject_reference="zofia-novak@gmail.com"
+POSLEVEL = """2026-03-15T07:00:00Z INFO service=downstream_delivery_service event=record_lookup seq=1 system="account_service" resource_id="account_022" record_type="USER_PROFILE" result="NOT_FOUND" subject_reference="person7@example.test"
 2026-03-15T07:00:00Z WARN service=downstream_delivery_service event=record_lookup seq=2 system="backup_service" resource_id="backup_5237" record_type="BACKUP_ARCHIVE" result="ACTIVE" subject_reference=""
 """
-JSONL = """2026-09-10T08:56:17Z {"severity":"DEBUG","service":"account_service","trace_id":"tr-5","event":"profile_lookup_started","lookup_key":"collins.grace@icloud.com"}
+JSONL = """2026-09-10T08:56:17Z {"severity":"DEBUG","service":"account_service","trace_id":"tr-5","event":"profile_lookup_started","lookup_key":"person1@example.test"}
 2026-09-10T08:56:20Z {"severity":"DEBUG","service":"account_service","trace_id":"tr-5","resource_id":"account_6633","event":"profile_lookup_completed","rows":"1","http_status":"200"}
 """
-BRACKET = """2026-07-28T05:51:18Z [DEBUG] [account_service] [tr-6074163] profile_lookup_started: instance="account-5" lookup_key="l.nascimento40@gmail.com" attempt="1"
+BRACKET = """2026-07-28T05:51:18Z [DEBUG] [account_service] [tr-6074163] profile_lookup_started: instance="account-5" lookup_key="person2@example.test" attempt="1"
 2026-07-28T05:57:13Z [INFO] [account_service] [tr-6074163] profile_lookup_completed: instance="account-5" resource_id="account_9549" rows="0" http_status="404"
 2026-07-28T05:51:16Z [DEBUG] [log_router] [collector-9] export_started: instance="collector-9" sources="platform_services"
 """
 PIPE = """2026-07-03T07:51:49Z | DEBUG | analytics_platform | tr-4862866 | analytics_profile_scan_started | instance="analytics-5" lookup_key="analytics_257" attempt="1"
-2026-07-03T07:51:51Z | WARN | analytics_platform | tr-4862866 | analytics_identity_scan | resource_id="analytics_4527" matched_value="mnovak939594@fastmail.com" direct_identifiers="1"
+2026-07-03T07:51:51Z | WARN | analytics_platform | tr-4862866 | analytics_identity_scan | resource_id="analytics_4527" matched_value="person4@example.test" direct_identifiers="1"
 2026-07-03T07:51:30Z | DEBUG | log_router | collector-5 | export_started | instance="collector-5" sources="platform_services"
 """
-SYSLOG = """2026-08-22T10:51:11Z <15>1 node-1 account_service tr-4973247 - - level=DEBUG instance="account-2" event="profile_lookup_started" lookup_key="nana.b9576@outlook.com"
+SYSLOG = """2026-08-22T10:51:11Z <15>1 node-1 account_service tr-4973247 - - level=DEBUG instance="account-2" event="profile_lookup_started" lookup_key="person5@example.test"
 2026-08-22T10:51:17Z <15>1 node-1 account_service tr-4973247 - - level=DEBUG instance="account-2" resource_id="account_1785" event="profile_lookup_completed" rows="1" http_status="200"
 """
 REQUESTID = (
-    '2026-06-08T09:53:40Z requestId=tr-7654854 level=DEBUG function=account_service message="instance=\\"account-4\\" event=\\"profile_lookup_started\\" lookup_key=\\"thabo.masuku@outlook.com\\" attempt=\\"1\\""\n'
+    '2026-06-08T09:53:40Z requestId=tr-7654854 level=DEBUG function=account_service message="instance=\\"account-4\\" event=\\"profile_lookup_started\\" lookup_key=\\"person6@example.test\\" attempt=\\"1\\""\n'
     '2026-06-08T09:53:48Z requestId=tr-7654854 level=INFO function=account_service message="instance=\\"account-4\\" resource_id=\\"account_4226\\" event=\\"profile_lookup_completed\\" rows=\\"0\\" http_status=\\"404\\""\n'
     '2026-06-08T06:52:07Z requestId=collector-1 level=DEBUG function=log_router message="instance=\\"collector-1\\" event=\\"export_started\\""\n'
 )
 
 DIALECTS = {
     # dialect: (text, non-blank lines, observations, first observation's resource, subject-linked resource, subject key)
-    "logfmt": (LOGFMT, 3, 2, "search_9", "account_4092", "leonie.g9352@outlook.com"),
+    "logfmt": (LOGFMT, 3, 2, "search_9", "account_4092", "person3@example.test"),
     "logfmt-poslevel": (POSLEVEL, 2, 2, "account_022", None, None),
-    "jsonl": (JSONL, 2, 1, "account_6633", "account_6633", "collins.grace@icloud.com"),
-    "bracket": (BRACKET, 3, 1, "account_9549", "account_9549", "l.nascimento40@gmail.com"),
-    "pipe": (PIPE, 3, 1, "analytics_4527", "analytics_4527", "mnovak939594@fastmail.com"),
-    "syslog": (SYSLOG, 2, 1, "account_1785", "account_1785", "nana.b9576@outlook.com"),
-    "requestid": (REQUESTID, 3, 1, "account_4226", "account_4226", "thabo.masuku@outlook.com"),
+    "jsonl": (JSONL, 2, 1, "account_6633", "account_6633", "person1@example.test"),
+    "bracket": (BRACKET, 3, 1, "account_9549", "account_9549", "person2@example.test"),
+    "pipe": (PIPE, 3, 1, "analytics_4527", "analytics_4527", "person4@example.test"),
+    "syslog": (SYSLOG, 2, 1, "account_1785", "account_1785", "person5@example.test"),
+    "requestid": (REQUESTID, 3, 1, "account_4226", "account_4226", "person6@example.test"),
 }
 
 

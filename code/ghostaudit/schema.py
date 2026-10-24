@@ -98,13 +98,18 @@ def system_for_resource(resource_id: str) -> Optional[str]:
 _CASE_RE = re.compile(r"^case_(\d+)$")
 
 
-def case_sort_key(case_id: str):
-    """Natural numeric order (case_33 < case_100). Unknown shapes sort last, by string.
+# How output.csv rows are ordered. The contract only says "sorted by case_id" and never says how, so this is a decision, not a fact:
+#   "numeric"       case_33 before case_100: the order of dataset/deletion_requests.csv (and of every other organizer table whose ids mix widths)
+#   "lexicographic" plain text order: case_100 before case_33
+# The evidence for each reading is in code/docs/design_decisions.md ("Row order"). Everything that writes, validates or scores rows goes
+# through case_sort_key, so this one constant is the only thing to change (tests/test_row_order.py then needs its pinned expectations updated).
+CASE_ORDER = "numeric"
 
-    The specification only says "sorted by case_id"; the input file and the
-    32 sample rows are in numeric order, so natural order is used (documented
-    in code/docs/design_decisions.md).
-    """
+
+def case_sort_key(case_id: str):
+    """Sort key for case ids under CASE_ORDER. Unknown shapes sort last, by string, in numeric mode."""
+    if CASE_ORDER == "lexicographic":
+        return case_id
     m = _CASE_RE.match(case_id)
     return (0, int(m.group(1)), case_id) if m else (1, 0, case_id)
 
@@ -238,7 +243,7 @@ def validate_output_rows(
         if extra:
             v.append(Violation("*", "extra_case", f"{len(extra)} unexpected, e.g. {extra[:5]}"))
     if ids != sorted(ids, key=case_sort_key):
-        v.append(Violation("*", "row_order", "rows are not in natural numeric case_id order"))
+        v.append(Violation("*", "row_order", f"rows are not in {CASE_ORDER} case_id order"))
     evidence = list(valid_evidence_ids) if valid_evidence_ids is not None else None
     for r in rows:
         try:

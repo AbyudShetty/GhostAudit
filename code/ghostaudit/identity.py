@@ -17,7 +17,7 @@ data), so they are kept only for diagnostics and are never matched.
 
 Matching is exact after a fixed normalisation (lower-case e-mail/hash, digits-only
 phone). There is no fuzzy or approximate matching, by design: near-miss addresses such
-as ``g.silva76.jr@gmail.com`` vs ``g.silva76@gmail.com`` are different identifiers.
+as ``j.doe.jr@example.test`` vs ``j.doe@example.test`` are different identifiers.
 """
 
 from __future__ import annotations

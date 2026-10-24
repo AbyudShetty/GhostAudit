@@ -18,9 +18,9 @@ CREATE TABLE customer_data_read_replica (
     resource_id TEXT PRIMARY KEY, origin_system TEXT NOT NULL, collection_name TEXT NOT NULL,
     record_json TEXT NOT NULL CHECK (json_valid(record_json)), updated_at TEXT NOT NULL
 );
-INSERT INTO "customer_data_primary" VALUES('search_1','search_service','customer_search_documents','{"resource_id":"search_1","document":{"display_name":"Arthur Lefèvre","email":"a.lefevre74@yahoo.com"}}','2026-09-21T10:00:00Z');
-INSERT INTO "customer_data_read_replica" VALUES('account_994','account_service','customer_profiles','{"resource_id":"account_994","email":"diya.k4436@outlook.com"}','2026-09-21T10:00:00Z');
-INSERT INTO "customer_data_read_replica" VALUES('search_1','search_service','customer_search_documents','{"resource_id":"search_1","document":{"display_name":"Arthur Lefèvre","email":"a.lefevre74@yahoo.com"}}','2026-09-21T10:00:00Z');
+INSERT INTO "customer_data_primary" VALUES('search_1','search_service','customer_search_documents','{"resource_id":"search_1","document":{"display_name":"Amélie Rousseau","email":"a.rousseau74@example.test"}}','2026-09-21T10:00:00Z');
+INSERT INTO "customer_data_read_replica" VALUES('account_994','account_service','customer_profiles','{"resource_id":"account_994","email":"d.sample4436@example.test"}','2026-09-21T10:00:00Z');
+INSERT INTO "customer_data_read_replica" VALUES('search_1','search_service','customer_search_documents','{"resource_id":"search_1","document":{"display_name":"Amélie Rousseau","email":"a.rousseau74@example.test"}}','2026-09-21T10:00:00Z');
 COMMIT;
 """
 
@@ -30,7 +30,7 @@ CREATE TABLE snapshot_scope (origin_system TEXT PRIMARY KEY, captured_at TEXT NO
 CREATE TABLE connector_subscriptions (resource_id TEXT PRIMARY KEY, customer_reference TEXT, customer_email TEXT, connector_name TEXT NOT NULL, enabled INTEGER NOT NULL CHECK (enabled IN (0,1)), last_delivery_status TEXT NOT NULL, updated_at TEXT NOT NULL);
 INSERT INTO snapshot_scope VALUES ('account_service', '2026-09-16T08:37:39Z');
 INSERT INTO snapshot_scope VALUES ('search_service', '2026-09-16T08:37:39Z');
-INSERT INTO connector_subscriptions VALUES ('data_flow_2406', NULL, 'ishaan.iyer@outlook.com', 'customer_events_connector', '1', 'delivered', '2026-09-16T07:04:46Z');
+INSERT INTO connector_subscriptions VALUES ('data_flow_2406', NULL, 'i.sample@example.test', 'customer_events_connector', '1', 'delivered', '2026-09-16T07:04:46Z');
 COMMIT;
 -- snapshot_completed_at=2026-09-16T08:37:39Z
 """
@@ -58,7 +58,7 @@ class SqlTopology(unittest.TestCase):
 
     def test_record_json_is_decoded_and_utf8_preserved(self):
         o = [o for o in self.r.observations if o.resource_id == "search_1"][0]
-        self.assertEqual(o.fields["record"]["document"]["display_name"], "Arthur Lefèvre")
+        self.assertEqual(o.fields["record"]["document"]["display_name"], "Amélie Rousseau")
         self.assertEqual(o.system_id, "search_service")
         self.assertEqual(o.collection, "customer_search_documents")
         self.assertEqual(o.observed_at, "2026-09-21T10:00:00Z")

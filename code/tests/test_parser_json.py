@@ -13,7 +13,7 @@ BUNDLE = {
         {
             "captured_at": "2026-09-15T12:00:00Z", "data_store": "identity_service", "collection": "deleted_customer_references",
             "records": [
-                {"resource_id": "tombstone_9178", "subject_reference": "user_542", "name": "Kofi Addo", "email": "addo.kofi@gmail.com", "account_status": "DELETED"},
+                {"resource_id": "tombstone_9178", "subject_reference": "user_542", "name": "Sam Example", "email": "example.sam@example.test", "account_status": "DELETED"},
                 {"resource_id": "tombstone_440", "subject_reference": "user_541", "name": None, "email": None, "account_status": "DELETED",
                  "recent_activity": [{"event": "x"}]},
             ],

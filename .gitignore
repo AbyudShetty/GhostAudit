@@ -8,3 +8,7 @@ __pycache__/
 .coverage
 *.tmp
 scratch/
+
+# the submission archive is a build product (python code/tools/package.py); in-progress writes too
+/code.zip
+*.part

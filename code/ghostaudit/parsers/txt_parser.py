@@ -5,7 +5,7 @@ Format (evidence/records/customer_account_handover_*.txt)::
     CUSTOMER PLATFORM - SHIFT HANDOVER
     Snapshot: 2026-10-01T12:00:00Z
     ...prose...
-    - 2026-10-01T12:00:00Z | account_service | account_146 | USER_PROFILE | NOT_FOUND | e.lindberg18@yahoo.com
+    - 2026-10-01T12:00:00Z | account_service | account_146 | USER_PROFILE | NOT_FOUND | user@example.test
 
 Lines starting with ``- `` are entries and must have exactly six ``|``-separated
 fields with a valid timestamp; anything else starting with ``- `` is a failure.

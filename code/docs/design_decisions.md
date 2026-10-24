@@ -3,14 +3,38 @@
 Status: Milestone 1 (foundation). Facts below were measured on the real dataset on 2026-10-24
 unless marked **[hypothesis]** or **[decision]**. Nothing here classifies cases or writes `output.csv`.
 
-## 1. Row ordering — **[decision]**
+## 1. Row ordering — **[decision under genuine ambiguity; re-examined 2026-10-25]**
 
-`problem_statement.md` and `README.md` say "sorted by `case_id`" without defining the order.
-Evidence: `dataset/deletion_requests.csv` is already in natural numeric order (`case_33 … case_550`)
-and the 32 sample rows are `case_01 … case_32`; plain string order would put `case_100` before `case_33`.
-**Rule:** natural numeric order (`schema.case_sort_key`); unknown id shapes sort last. Deterministic.
-Risk: a grader that string-sorts would see the same *set* of rows; most graders key on `case_id`, so the
-exposure is low but not zero. Cheap to flip (one function).
+`problem_statement.md`, `README.md` and `AGENTS.md` say "sorted by `case_id`" (the AGENTS rule: "Sort rows by `case_id`"). No version of any of
+them, in any of the 11 commits that contain the sentence, says how: nothing like "numeric", "natural" or "alphabetical". The two readings differ on mixed-width ids
+(`case_33` before `case_100` numerically; `case_100` before `case_33` as text) and they differ in **all 518** positions of the evaluation set.
+
+**Evidence for numeric order**
+* `dataset/deletion_requests.csv` — the file the output must mirror ("one row for every case in `deletion_requests.csv`") — is in numeric order
+  (`case_33 … case_550`), and is not in text order.
+* Every other organizer-written table whose ids mix widths is in numeric order and not in text order: `system_activity.csv` (4,011 rows),
+  `user_audit_log.csv` (306), `user_identities.csv` (850). That is 4 of 4. If the hidden answers were produced by the same generator they would follow suit, but that is an assumption: nothing in the
+  materials says how they were produced.
+* The evaluation paragraph lists per-case scoring facets (status, identity resolution, discovered records, evidence, policy, `steps_json`
+  order). Row order is not one of them, which suggests answers are matched by `case_id`.
+
+**Evidence for text order**
+* Read literally by a programmer, "sorted by `case_id`" is `sorted(case_ids)` on strings. A validator or an answer file produced that way would
+  be in text order. Nothing in the materials rules this out.
+* The statement does use "ascending order" for `resource_id` (also an id with a numeric tail) but never shows an example.
+
+**What cannot tell the readings apart**: the 32 sample answers and sample requests (ids zero-padded to one width, so both orders coincide);
+`dataset/output.csv` (header only); the sample answers' steps (no two steps tie on phase, operation and system, so "ascending `resource_id`"
+is never exercised); the wording history (the sentence only gained a row count, 500 → 510 → 518, and a "plus the header row" note).
+
+**Choice: numeric** (`schema.CASE_ORDER = "numeric"`, `schema.case_sort_key`; ids of another shape sort last). It is the order of the only
+file the output mirrors and of every comparable organizer table. If the grader matches by `case_id` the choice is irrelevant; if it compares
+row by row against answers written by the generator, numeric is the likelier match. This is a judgement, not a finding: the materials do not
+settle it, and only the organizers can.
+
+**Cost to change**: set `CASE_ORDER = "lexicographic"` in `ghostaudit/schema.py`. Writer, validator, scorer and the CLI follow; `tests/test_row_order.py`
+proves the 518 rows are identical in either mode and only their order differs. Update the pinned expectations in its `Decision` class and the
+sentence in README section 3.
 
 ## 2. Time rules
 

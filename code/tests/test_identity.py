@@ -22,7 +22,7 @@ def change(aid, uid, t, field, old, new):
 
 # user_1 changed e-mail twice (a -> b -> c), phone once; user_2 never changed; user_3 shares user_1's *name*.
 IDENTITIES = [
-    ident("user_1", "Ann Lee", "ann.c@x.com", "+1 (202) 555-0103"),
+    ident("user_1", "Ann Lee", "ann.c@x.com", "+1 (202) 555-0100"),
     ident("user_2", "Bob Roy", "bob@y.org", "+44 20 7946 0958"),
     ident("user_3", "Ann Lee", "ann.other@z.net", "+49 30 1234567"),
 ]
@@ -31,7 +31,7 @@ LOG = [
     change("audit_2", "user_1", "2025-01-10T10:00:00Z", "email_hash", h("ann.a@x.com"), h("ann.b@x.com")),
     change("audit_3", "user_1", "2026-03-01T08:00:00Z", "email", "ann.b@x.com", "ann.c@x.com"),
     change("audit_4", "user_1", "2026-03-01T08:00:00Z", "email_hash", h("ann.b@x.com"), h("ann.c@x.com")),
-    change("audit_5", "user_1", "2025-06-01T00:00:00Z", "phone", "+1 202 555 0000", "+1 (202) 555-0103"),
+    change("audit_5", "user_1", "2025-06-01T00:00:00Z", "phone", "+1 202 555 0000", "+1 (202) 555-0100"),
 ]
 
 
@@ -89,7 +89,7 @@ class OtherIdentifiers(unittest.TestCase):
         self.assertEqual(self.g.resolve("email_hash", h("unrelated@q.com")).status, "UNRESOLVED")
 
     def test_phone_formatting_is_normalised_historical_included(self):
-        r = self.g.resolve("phone", "+1 202-555-0103")
+        r = self.g.resolve("phone", "+1 202-555-0100")
         self.assertEqual((r.user_id, r.relation, r.match), ("user_1", "current", "normalized"))
         self.assertEqual(self.g.resolve("phone", "+12025550000").relation, "historical")
         self.assertEqual(self.g.resolve("phone", "+1 202 555 9999").status, "UNRESOLVED")
@@ -100,7 +100,7 @@ class OtherIdentifiers(unittest.TestCase):
 
     def test_multiple_identifiers_of_one_user_all_resolve_to_it(self):
         users = {self.g.resolve(k, v).user_id for k, v in (
-            ("email", "ann.a@x.com"), ("email", "ann.c@x.com"), ("email_hash", h("ann.b@x.com")), ("phone", "+12025550103"), ("user_ref", "user_1"))}
+            ("email", "ann.a@x.com"), ("email", "ann.c@x.com"), ("email_hash", h("ann.b@x.com")), ("phone", "+12025550100"), ("user_ref", "user_1"))}
         self.assertEqual(users, {"user_1"})
 
     def test_unsupported_kind(self):
@@ -192,7 +192,7 @@ class Determinism(unittest.TestCase):
             self.assertEqual([str(i) for i in g.issues], [str(i) for i in base.issues])
 
     def test_normalise(self):
-        self.assertEqual(normalise("phone", "+1 (202) 555-0103"), "+12025550103")
+        self.assertEqual(normalise("phone", "+1 (202) 555-0100"), "+12025550100")
         self.assertEqual(normalise("email", " A@B.Co "), "a@b.co")
 
 

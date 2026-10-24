@@ -42,10 +42,19 @@ class DatasetCheck(unittest.TestCase):
 
     def test_required_files_list_matches_what_the_loader_reads(self):
         self.assertEqual(len(REQUIRED_FILES), len(set(REQUIRED_FILES)))
-        self.assertIn("sample_output.csv", REQUIRED_FILES)
+        self.assertNotIn("sample_output.csv", REQUIRED_FILES)  # predictions must not depend on the supplied sample answers
+
+    def test_dataset_without_sample_answers_still_loads(self):
+        from tests.world import World
+
+        w = World().case("case_1").build()  # a synthetic dataset, so this runs without the real one
+        (Path(w._dir) / "sample_output.csv").unlink()
+        self.assertEqual(load_dataset(w._dir).sample_output, [])
+        w.close()
 
 
 class BadPaths(unittest.TestCase):
+    @needs_dataset  # the hint points at <repo>/dataset, which only exists when the dataset is present
     def test_wrong_relative_dataset_from_code_gives_a_clear_error_and_a_hint(self):
         r = run(CODE_DIR, "-m", "ghostaudit", "--dataset", "dataset", "validate-samples")
         self.assertEqual(r.returncode, 2)
@@ -101,6 +110,58 @@ class FromBothDirectories(unittest.TestCase):
             self.check(REPO, ["code/main.py", "predict", "--samples", "--out", str(a)], a)
             self.check(CODE_DIR, ["-m", "ghostaudit", "predict", "--samples", "--out", str(b)], b)
             self.assertEqual(a.read_bytes(), b.read_bytes())
+
+
+def copy_package(dest: Path) -> Path:
+    """A throw-away 'extracted package': <dest>/code with the sources and no dataset, so its root is <dest>."""
+    shutil.copytree(CODE_DIR, dest / "code", ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "tests", "analysis", "docs"))
+    return dest
+
+
+@needs_dataset
+class Submit(unittest.TestCase):
+    """'submit' writes <root>/output.csv for the tree it runs from, so these run in a copy and never touch the repository root."""
+
+    def test_bare_invocation_and_submit_write_the_same_valid_518_row_file_at_their_own_root(self):
+        before = (REPO / "output.csv").exists()
+        with tempfile.TemporaryDirectory() as d:
+            root = copy_package(Path(d))
+            r = run(root, "code/main.py", "--dataset", str(DATASET))
+            self.assertEqual(r.returncode, 0, r.stderr)
+            out = root / "output.csv"
+            text = out.read_bytes().decode("utf-8")
+            rows = parse_output_csv(text)
+            self.assertEqual(text.splitlines()[0], "case_id,deletion_status,steps_json")
+            self.assertEqual(len(rows), 518)
+            ids = [x["case_id"] for x in rows]
+            self.assertEqual(ids, sorted(ids, key=lambda c: int(c.split("_")[1])))
+            self.assertEqual(validate_output_rows(rows, None, None, allow_empty_deletion_steps=True), [])
+            self.assertFalse((root / "output.csv.part").exists())
+            elsewhere = root / "other" / "o.csv"
+            r2 = run(root, "code/main.py", "--dataset", str(DATASET), "submit", "--out", str(elsewhere))
+            self.assertEqual(r2.returncode, 0, r2.stderr)
+            self.assertEqual(out.read_bytes(), elsewhere.read_bytes())
+        self.assertEqual((REPO / "output.csv").exists(), before)
+
+    def test_submit_refuses_to_write_inside_the_dataset_directory(self):
+        with tempfile.TemporaryDirectory() as d:
+            copy = Path(d) / "dataset"
+            copy.mkdir()
+            for n in REQUIRED_FILES:
+                shutil.copy(DATASET / n, copy / n)
+            r = run(REPO, "code/main.py", "--dataset", str(copy), "submit", "--out", str(copy / "output.csv"))
+            self.assertEqual(r.returncode, 2)
+            self.assertIn("dataset directory", r.stderr)
+            self.assertFalse((copy / "output.csv").exists())
+
+    def test_without_a_dataset_the_error_is_clear(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = copy_package(Path(d))
+            r = run(root, "code/main.py")
+            self.assertEqual(r.returncode, 2)
+            self.assertIn("dataset directory not found", r.stderr)
+            self.assertNotIn("Traceback", r.stderr)
+            self.assertFalse((root / "output.csv").exists())
 
 
 @needs_dataset

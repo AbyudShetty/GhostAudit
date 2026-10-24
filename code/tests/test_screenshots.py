@@ -16,8 +16,8 @@ from ghostaudit.state import ACTIVE, DEIDENTIFIED, IDENTIFIABLE, PRESENT, UNKNOW
 import ghostaudit.screenshots as S
 
 EMAIL = "gabriel.silva@gmail.com"
-GRAPH = IdentityGraph([Identity("user_13", "Gabriel Silva", EMAIL, "+55 11 91234 5678", hashlib.sha256(EMAIL.encode()).hexdigest(), "2026-01-01T00:00:00Z"),
-                       Identity("user_14", "Aditi Jain", "aditi@x.com", "+91 1", hashlib.sha256(b"aditi@x.com").hexdigest(), "2026-01-01T00:00:00Z")], [])
+GRAPH = IdentityGraph([Identity("user_13", "Gil Sample", EMAIL, "+55 11 91234 5678", hashlib.sha256(EMAIL.encode()).hexdigest(), "2026-01-01T00:00:00Z"),
+                       Identity("user_14", "Ana Example", "aditi@x.com", "+91 1", hashlib.sha256(b"aditi@x.com").hexdigest(), "2026-01-01T00:00:00Z")], [])
 CAPTURED = "2026-09-01T06:00:00Z"
 ROW_TIME = "2026-09-01T06:07:01Z"
 
@@ -32,18 +32,18 @@ def image(*lines):
 
 class Canonicalisation(unittest.TestCase):
     def test_glyph_confusions_collapse_on_both_sides(self):
-        self.assertEqual(canon("g.silva76@gmaiI.com"), canon("g.silva76@gmail.com"))
+        self.assertEqual(canon("j.sample76@gmaiI.com"), canon("j.sample76@gmail.com"))
         self.assertEqual(canon("user_ll • account _5762"), canon("user_11 account_5762"))
         self.assertEqual(canon("search_42B"), canon("search_428"))
 
     def test_different_values_stay_different(self):
-        self.assertNotEqual(canon("g.silva76@gmail.com"), canon("g.silva76.jr@gmail.com"))
+        self.assertNotEqual(canon("j.sample76@gmail.com"), canon("j.sample76.jr@gmail.com"))
         self.assertNotEqual(canon("account_5762"), canon("account_5763"))
 
 
 class Grounding(unittest.TestCase):
     def test_known_resource_id_in_ocr_grounds_with_content(self):
-        g = ground(row("search_428", "Data catalog linked search_428 (search_428) to " + EMAIL + " and user_13."), image("Raw document · search_42B", "email g.silva76@gmaiI.com"), GRAPH, "user_13")
+        g = ground(row("search_428", "Data catalog linked search_428 (search_428) to " + EMAIL + " and user_13."), image("Raw document · search_42B", "email j.sample76@gmaiI.com"), GRAPH, "user_13")
         self.assertEqual(g.level, "catalog+ocr")
         self.assertIn("resource_id", g.matched)
 
@@ -65,7 +65,7 @@ class Grounding(unittest.TestCase):
 
 class Visibility(unittest.TestCase):
     def test_subject_identifiers_found_by_kind_only(self):
-        v = visible_identifiers(image("Gabriel Silva", "g.silva76@gmaiI.com", "user_13"), GRAPH, "user_13")
+        v = visible_identifiers(image("Gil Sample", "j.sample76@gmaiI.com", "user_13"), GRAPH, "user_13")
         self.assertEqual(set(v), {"name", "user_ref"})  # the OCR'd e-mail is a different address (g.silva76) so it is NOT the subject's
         self.assertEqual(set(visible_identifiers(image(EMAIL.replace("l", "I")), GRAPH, "user_13")), {"email"})
 
@@ -135,7 +135,7 @@ class NoLeakIntoLinking(unittest.TestCase):
     def test_other_people_on_screen_do_not_create_ownership(self):
         ev = EvidenceFile("evidence_x", "evidence/images/x.png", "o", CAPTURED)
         cache = {"evidence_x": OcrImage("evidence_x", "evidence/images/x.png", "0" * 64,
-                                        ("data_flow_1121", "Healthy Continuous", EMAIL, "aditi@x.com", "Gabriel Silva"))}
+                                        ("data_flow_1121", "Healthy Continuous", EMAIL, "aditi@x.com", "Gil Sample"))}
         ds = _FakeDataset([ev], [row("data_flow_1121", f"Data catalog linked data_flow_1121 (data_flow_1121) to {EMAIL} and user_13.")])
         orig = S.verify_cache
         S.verify_cache = lambda c, r: []  # bytes are not the point here
@@ -159,7 +159,7 @@ class CatalogAliasForDocuments(unittest.TestCase):
 
     def test_document_number_in_the_text_grounds_the_resource_the_catalog_names_by_that_number(self):
         r, o = self.doc("NORTHSTAR SHOP - CUSTOMER STATEMENT Statement NST-2026-0718-1842 ingrid")
-        ds = _FakeDataset([], [row("export_1842", "Data catalog linked export_1842 (NST-2026-0718-1842) to ingrid.dahl@outlook.com and user_18.")])
+        ds = _FakeDataset([], [row("export_1842", "Data catalog linked export_1842 (NST-2026-0718-1842) to i.example@outlook.test and user_18.")])
         notes = S.attach_catalog_aliases(ds, [r])
         self.assertEqual(o.fields["resource_ids"], ["export_1842"])
         self.assertEqual(o.fields["catalog_alias_matches"][0]["catalog_activity"], "activity_1")

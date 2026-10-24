@@ -33,10 +33,11 @@ class Tables(unittest.TestCase):
         self.assertEqual(OPERATION_STATE["REPORT_RESTORE_RISK"], "ACTIVE")
         self.assertEqual(list(OPERATION_ORDER)[0], "REPORT_REMAINING_RECORD")
 
-    def test_case_order_is_natural_numeric(self):
+    def test_case_order_follows_the_documented_choice(self):
+        # The contract does not say how "sorted by case_id" sorts; the choice and its evidence are pinned in tests/test_row_order.py.
         ids = ["case_100", "case_33", "case_1000", "case_9", "case_550"]
         self.assertEqual(sorted(ids, key=case_sort_key), ["case_9", "case_33", "case_100", "case_550", "case_1000"])
-        self.assertEqual(sorted(ids)[0], "case_100")  # plain string sort would wrongly put case_100 first
+        self.assertNotEqual(sorted(ids, key=case_sort_key), sorted(ids))  # the two readings differ on mixed-width ids, so the choice matters
 
     def test_resource_prefix_mapping(self):
         self.assertEqual(system_for_resource("audit_record_2016"), "security_service")

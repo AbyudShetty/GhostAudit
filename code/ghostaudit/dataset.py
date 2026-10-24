@@ -158,7 +158,8 @@ class Dataset:
 
 
 REQUIRED_FILES = ("deletion_requests.csv", "sample_deletion_requests.csv", "user_identities.csv", "user_audit_log.csv",
-                  "system_activity.csv", "deletion_rules.csv", "evidence_files.csv", "sample_output.csv")
+                  "system_activity.csv", "deletion_rules.csv", "evidence_files.csv")
+# sample_output.csv holds the supplied sample answers. Predictions never read it; it is loaded when present for the local scorer and tests.
 
 
 class DatasetNotFound(FileNotFoundError):
@@ -187,7 +188,7 @@ def load_dataset(root: os.PathLike) -> Dataset:
         activity=_load(root / "system_activity.csv", Activity, ("event_time",), "activity_id"),
         rules=_load(root / "deletion_rules.csv", Rule, (), "rule_id"),
         evidence_files=_load(root / "evidence_files.csv", EvidenceFile, ("captured_at",), "file_id"),
-        sample_output=read_csv_dicts(root / "sample_output.csv")[1],
+        sample_output=read_csv_dicts(root / "sample_output.csv")[1] if (root / "sample_output.csv").is_file() else [],
     )
     for t in (ds.requests, ds.sample_requests):
         for i, r in enumerate(t.rows, start=2):

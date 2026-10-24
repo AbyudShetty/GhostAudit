@@ -12,8 +12,8 @@ Snapshot: 2026-10-01T12:00:00Z
 
 Account and downstream checks completed during the shift:
 
-- 2026-10-01T12:00:00Z | account_service | account_146 | USER_PROFILE | NOT_FOUND | e.lindberg18@yahoo.com
-- 2026-10-01T12:00:00Z | account_service | account_1810 | USER_PROFILE | NOT_FOUND | CHOI.JIHOON94@GMAIL.COM
+- 2026-10-01T12:00:00Z | account_service | account_146 | USER_PROFILE | NOT_FOUND | e.example18@example.test
+- 2026-10-01T12:00:00Z | account_service | account_1810 | USER_PROFILE | NOT_FOUND | LEE.SAMPLE94@EXAMPLE.TEST
 - 2026-10-01T12:00:00Z | analytics_platform | analytics_6830 | ANALYTICS_PROFILE | ANONYMIZED | no direct identifier
 """
 
@@ -32,8 +32,8 @@ class Txt(unittest.TestCase):
     def test_fields_preserved_verbatim_including_case(self):
         o = parse_txt_text("e", "h.txt", HANDOVER).observations[1]
         self.assertEqual((o.resource_id, o.system_id, o.collection, o.observed_at), ("account_1810", "account_service", "USER_PROFILE", "2026-10-01T12:00:00Z"))
-        self.assertEqual(o.fields, {"category": "USER_PROFILE", "state": "NOT_FOUND", "identifier": "CHOI.JIHOON94@GMAIL.COM"})
-        self.assertEqual([i.norm for i in o.identifiers()], ["choi.jihoon94@gmail.com"])  # normalised only for joining
+        self.assertEqual(o.fields, {"category": "USER_PROFILE", "state": "NOT_FOUND", "identifier": "LEE.SAMPLE94@EXAMPLE.TEST"})
+        self.assertEqual([i.norm for i in o.identifiers()], ["lee.sample94@example.test"])  # normalised only for joining
 
     def test_no_direct_identifier_text_is_kept_verbatim(self):
         o = parse_txt_text("e", "h.txt", HANDOVER).observations[2]
@@ -71,10 +71,10 @@ class Identifiers(unittest.TestCase):
         return Observation("e", "json", "$", "account_1", fields=fields)
 
     def test_kinds_and_normalisation(self):
-        h = "d4e1f59abcf9a1e0cfdc7c27ad6c07ed4ff88b326a16ed5eed5ec6bc31618c93"
-        o = self.obs(email="Amina.ElMasri@Gmail.com", ref="user_01", phone="+971 50 482 7316", hash=h, note="plain words")
+        h = "f2989219bf906a4c016a25386110c34a55649a1f19aeba522e01067e28c9c153"
+        o = self.obs(email="Jo.Example@Example.Test", ref="user_01", phone="+44 20 7946 0958", hash=h, note="plain words")
         got = {(i.kind, i.norm) for i in extract_identifiers(o)}
-        self.assertEqual(got, {("email", "amina.elmasri@gmail.com"), ("user_ref", "user_01"), ("phone", "+971504827316"), ("email_hash", h)})
+        self.assertEqual(got, {("email", "jo.example@example.test"), ("user_ref", "user_01"), ("phone", "+442079460958"), ("email_hash", h)})
 
     def test_integrity_seal_is_not_an_email_hash(self):
         seal = "sha256:" + "0" * 60 + "1afd"
