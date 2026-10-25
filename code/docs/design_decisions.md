@@ -77,6 +77,16 @@ eligible observations; S3 as S2 but resource→user *association* may come from 
   38 SUCCESS / 20 PARTIAL / 23 FAILED / 9 absent. 262 of 518 cases have no account linkable by content at all
   (even under S3) and depend on activity-timing attribution or on information absent from the files.
 
+**[re-examined, 2026-10-25]** The default stays **S3k**. An audit showed that a later file could turn a withheld proof into a
+"direct" one, flip a status (synthetic only) and resolve another case's ambiguous account, which the literal wording of AGENTS.md 6.2
+forbids. We implemented and measured the strict alternative, S2 (identity only from sources captured by `audit_at`, ownership checked
+per case). On all 550 requests it changes no status, but it loses 9 sample answer steps (all reachable only through later files) and
+160 evaluation steps. AGENTS.md 6.1 calls the sample answers correct, so we follow them and flag the conflict with 6.2 openly (README,
+evaluation report). What S3k keeps from that work: ownership evaluated per case, "not used" diagnostics, and S2 available as
+`link_policy="S2"` with its guarantees tested. Under S3k a later file still never sets state and is never cited, and no
+inferred-identity proof may rest on a rival ruled out only by a later file (`classification.LATER_OWNERSHIP`). The history below is kept
+as it was.
+
 **[superseded by M2 — see `m2_identity_linking.md`]** The M1 recommendation was S3. M2 refined it to **S3k**
 (post-audit sources may identify only account / security-audit / legal-hold resources) and corrected two M1 numbers:
 the "90 accounts" figure is 81 in deletion cases + 9 in non-deletion requests, and the "39" was not reproducible.

@@ -56,7 +56,7 @@ class ReportNumbers(unittest.TestCase):
 
         ds = real_dataset()
         cr = CaseReconstructor(ds)
-        cls.v = classify_all(cr, ds.requests.rows + ds.sample_requests.rows)
+        cls.v = {**classify_all(cr, ds.requests.rows), **classify_all(cr, ds.sample_requests.rows)}  # as the CLI runs each population
         cls.plans = plan_all(cls.v, cr.manifest)
         cls.ds = ds
         gold = {r["case_id"]: (r["deletion_status"], json.loads(r["steps_json"])) for r in ds.sample_output}
@@ -99,8 +99,9 @@ class ReportNumbers(unittest.TestCase):
         det = Counter((self.plans[c].status, self.plans[c].determination) for c in ids)
         self.assertIn(f"{det[('INCOMPLETE', 'PROVEN')]} PROVEN, {det[('INCOMPLETE', 'SUPPORTED')]} SUPPORTED", t)
         self.assertIn(f"{det[('COMPLETE', 'PROVEN')]} PROVEN, {det[('COMPLETE', 'INFERRED')]} INFERRED, {det[('COMPLETE', 'PARTIAL')]} PARTIAL", t)
-        withheld = sum(len(self.plans[c].withheld) for c in ids)
-        self.assertGreaterEqual(withheld, 179)  # the report's 179 counts steps withheld, not notes
+        withheld = Counter((self.plans[c].status, w.phase) for c in ids for w in self.plans[c].withheld)
+        self.assertIn(f"| Verification steps withheld | {sum(withheld.values())} ({withheld[('COMPLETE', 'VERIFICATION')]} in COMPLETE cases, "
+                      f"{withheld[('INCOMPLETE', 'VERIFICATION')]} in INCOMPLETE cases)", t)  # the report states exactly what the plans withhold
         empty = sorted(c for c in ids if self.plans[c].status == "COMPLETE" and not self.plans[c].steps)
         self.assertEqual(empty, ["case_45", "case_55", "case_63"])
         for c in empty:

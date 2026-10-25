@@ -9,11 +9,16 @@ Hard filters (all must hold for a candidate):
 
 1. the row is a deletion-worker ``DELETE_RECORD`` on an ``account_service`` resource;
 2. it lies inside the request lifecycle ``[requested_at, audit_at]`` **and** within
-   ``WINDOW_MIN`` minutes of ``reported_at`` (empirical regularity, see ``scenario.py``);
+   ``WINDOW_MIN`` minutes of ``reported_at`` (empirical regularity, see ``scenario.py``). An account can have several rows (a
+   retry); all are kept, and for each case the *last* row inside that case's window speaks for the account (a retry supersedes the
+   attempt before it; rows outside the window belong to another timeline). Rows are ordered by (event_time, activity_id), so the
+   order of ``system_activity.csv`` cannot change the result;
 3. its result is compatible with the case's ``reported_status`` (COMPLETE/SUCCESS, PARTIALLY_COMPLETE/
    PARTIAL, NOT_STARTED/FAILED). Both are claims of the same workflow, so agreement is a *matching key*,
    not proof of state (validated: 252 of 253 content-linked pairs agree);
-4. the account is not owned (by any content link) by a different user.
+4. the account is not owned (by any content link) by a different user. Ownership is *case-specific*: only links the link policy
+   admits at that case's ``audit_at`` count (by default: sources captured at or before it), so evidence captured later can
+   neither make an account the subject's nor rule a candidate out, for this case or for any other.
 
 Resolution: a case whose own account is already linked by content and whose delete row passes 1-2 is
 ``CONTENT`` (high confidence; filter 3 is not applied to it, because the identifier already says whose account it is and a
@@ -32,7 +37,7 @@ from dataclasses import dataclass
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
 
 from .dataset import Activity, DeletionRequest
-from .linker import LinkIndex
+from .linker import DEFAULT_POLICY, POLICIES, LinkIndex, LinkPolicy
 from .timeutil import parse_ts
 
 WINDOW_MIN = (-90.0, 15.0)
@@ -62,21 +67,42 @@ class AccountAttribution:
     reasons: Tuple[str, ...]
     content_accounts: Tuple[str, ...] = ()  # accounts owned by the user, in or out of the window
     rejected: Tuple[Tuple[str, str], ...] = ()  # (resource_id, why) for accounts seen in the window and ruled out
+    later_ownership: bool = False  # a STRONG assignment that needs ownership known only from sources captured after audit_at
 
 
 class AccountAttributor:
     def __init__(self, activities: Iterable[Activity], links: LinkIndex, window_min: Tuple[float, float] = WINDOW_MIN,
-                 require_result_match: bool = True):
+                 require_result_match: bool = True, policy: LinkPolicy = POLICIES[DEFAULT_POLICY]):
         self.window_min = window_min
         self.require_result_match = require_result_match
-        self.events: Dict[str, Activity] = {}
+        self.policy = policy
+        self.links = links
+        events: Dict[str, List[Activity]] = defaultdict(list)
         for a in activities:
             if a.source_system == "deletion_worker" and a.target_system == "account_service" and a.event_type == "DELETE_RECORD":
-                self.events[a.resource_id] = a
-        self.owners: Dict[str, Set[str]] = defaultdict(set)
-        for l in links.links:
-            if l.resource_id.startswith("account_"):
-                self.owners[l.resource_id].add(l.user_id)
+                events[a.resource_id].append(a)
+        # every deletion-worker row per account, in time order (ties by activity id): independent of the file's row order
+        self.events: Dict[str, List[Activity]] = {r: sorted(v, key=lambda a: (parse_ts(a.event_time), a.activity_id)) for r, v in events.items()}
+        self._account_links = [l for l in links.links if l.resource_id.startswith("account_")]
+        self._owners: Dict[Tuple[str, str], Dict[str, Set[str]]] = {}
+
+    def owners_at(self, audit_at: str, policy: Optional[LinkPolicy] = None) -> Dict[str, Set[str]]:
+        """Account -> users whose links to it the link policy admits at ``audit_at`` (cached per audit time)."""
+        policy = policy or self.policy
+        key = (policy.name, audit_at)
+        if key not in self._owners:
+            owners: Dict[str, Set[str]] = defaultdict(set)
+            for l in self._account_links:
+                if self.links.admissible(l, audit_at, policy)[0]:
+                    owners[l.resource_id].add(l.user_id)
+            self._owners[key] = owners
+        return self._owners[key]
+
+    def row_for(self, case: DeletionRequest, resource_id: str) -> Optional[Tuple[Activity, float]]:
+        """The deletion-worker row that speaks for ``resource_id`` in ``case`` and its offset (minutes from ``reported_at``): the
+        last of the account's rows inside the case's window, or ``None``."""
+        hits = [(a, off) for a in self.events.get(resource_id, ()) for inwin, off in [self._window(case, a)] if inwin]
+        return hits[-1] if hits else None
 
     def _window(self, case: DeletionRequest, a: Activity) -> Tuple[bool, float]:
         t = parse_ts(a.event_time)
@@ -84,29 +110,28 @@ class AccountAttributor:
         lifecycle = parse_ts(case.requested_at) <= t <= parse_ts(case.audit_at)
         return (lifecycle and self.window_min[0] <= off <= self.window_min[1]), off
 
-    def attribute(self, cases: Sequence[Tuple[DeletionRequest, str]], hide_content_for: Iterable[str] = ()) -> Dict[str, AccountAttribution]:
+    def attribute(self, cases: Sequence[Tuple[DeletionRequest, str]], hide_content_for: Iterable[str] = (),
+                  policy: Optional[LinkPolicy] = None) -> Dict[str, AccountAttribution]:
         """``cases``: (request, user_id) pairs for deletion requests. ``hide_content_for``: validation only - pretend these
-        cases' own content links are unknown (the accounts then count as unowned)."""
-        hide = set(hide_content_for)
+        cases' own content links are unknown (the accounts then count as unowned). ``policy``: the link policy (default: the
+        attributor's), applied at each case's own ``audit_at``."""
         by_case = {c.case_id: (c, u) for c, u in cases}
-        owners = {r: set(u) for r, u in self.owners.items()}
-        for cid in hide:
-            c, u = by_case[cid]
-            for r, us in owners.items():
-                if u in us:
-                    us.discard(u)
+        hidden = {by_case[cid][1] for cid in hide_content_for}
         out: Dict[str, AccountAttribution] = {}
         pools: Dict[str, Dict[str, AccountCandidate]] = {}
         rejected: Dict[str, List[Tuple[str, str]]] = {}
         content: Dict[str, List[str]] = {}
         for c, u in cases:
+            owners = {r: us - hidden for r, us in self.owners_at(c.audit_at, policy).items()}  # what was knowable for *this* case
             pools[c.case_id], rejected[c.case_id], content[c.case_id] = {}, [], sorted(r for r, us in owners.items() if u in us)
             want = RESULT_FOR_STATUS.get(c.reported_status)
             own_hits: List[str] = []
-            for rid, a in sorted(self.events.items()):
-                inwin, off = self._window(c, a)
-                if not inwin:
+            own_rows: Dict[str, Activity] = {}
+            for rid in sorted(self.events):
+                hit = self.row_for(c, rid)
+                if hit is None:
                     continue
+                a, off = hit
                 if owners.get(rid) and u not in owners[rid]:
                     rejected[c.case_id].append((rid, "owned by another user"))
                     continue
@@ -114,6 +139,7 @@ class AccountAttributor:
                     # the subject's own identifier already names this account: the result key only chooses among *unowned* accounts,
                     # and a partial workflow can contain a successful account delete
                     own_hits.append(rid)
+                    own_rows[rid] = a
                     continue
                 if self.require_result_match and want is not None and a.reported_result != want:
                     rejected[c.case_id].append((rid, f"result {a.reported_result} incompatible with reported_status {c.reported_status}"))
@@ -121,11 +147,11 @@ class AccountAttributor:
                 pools[c.case_id][rid] = AccountCandidate(rid, a.activity_id, a.event_time, round(off, 1), a.reported_result)
             if len(own_hits) == 1:
                 out[c.case_id] = AccountAttribution(c.case_id, u, CONTENT, HIGH, own_hits[0], (), (
-                    f"content link + deletion-worker row {self.events[own_hits[0]].activity_id} inside the lifecycle window with a result compatible with reported_status",),
+                    f"content link + deletion-worker row {own_rows[own_hits[0]].activity_id} inside the lifecycle window with a result compatible with reported_status",),
                     tuple(content[c.case_id]), tuple(rejected[c.case_id]))
             elif len(own_hits) > 1:
                 out[c.case_id] = AccountAttribution(c.case_id, u, AMBIGUOUS, NO_CONFIDENCE, None,
-                                                    tuple(AccountCandidate(r, self.events[r].activity_id, self.events[r].event_time, 0.0, self.events[r].reported_result) for r in own_hits),
+                                                    tuple(AccountCandidate(r, own_rows[r].activity_id, own_rows[r].event_time, 0.0, own_rows[r].reported_result) for r in own_hits),
                                                     ("several content-linked accounts of this user fit the window",), tuple(content[c.case_id]), tuple(rejected[c.case_id]))
         # accounts already settled by content are not available to anyone else
         taken: Dict[str, str] = {r.account: cid for cid, r in out.items() if r.status == CONTENT and r.account}

@@ -40,7 +40,7 @@ Other commands (all work from the repository root or from `code/`; a relative `-
 | `python code/main.py validate-samples` | validate the supplied sample answers against the output contract |
 | `python code/main.py inventory [--json]` | parse every evidence file and report counts and failures |
 | `python code/main.py --dataset PATH ...` | use a dataset in another location (read-only) |
-| `python code/main.py ... --emit-proofs KIND` | also emit COMPLETE proofs that rest on one kind of inference: `inferred-identity`, `scoped-snapshot` or `document-or-ocr` (repeatable; all off by default, see section 6) |
+| `python code/main.py ... --emit-proofs KIND` | also emit COMPLETE proofs that rest on another kind of inference: `scoped-snapshot` or `document-or-ocr` (repeatable; `inferred-identity` is already on by default, the other two are off; see section 6) |
 | `python code/main.py ... --emit-inferred-proofs` | shorthand for all three `--emit-proofs` kinds |
 
 A wrong dataset path, or a `deletion_rules.csv` that differs from the treatments the program applies, stops with a clear message and exit code 2 (nothing is written).
@@ -70,7 +70,7 @@ python code/main.py predict --samples --out samples.csv
 python code/evaluation/main.py --pred samples.csv          # local scorer: case (status), row, step, field and sequence accuracy
 ```
 
-Results, the 19 sample verification steps we deliberately do not emit, and the 3 COMPLETE evaluation cases with no directly provable step are described in `code/evaluation/evaluation_report.md`.
+Results, the 18 sample verification steps we do not emit, and the 3 COMPLETE evaluation cases with no directly provable step are described in `code/evaluation/evaluation_report.md`.
 
 ## 5. How it works
 
@@ -86,7 +86,8 @@ Each stage is a separate module in `code/ghostaudit/`, so a claim can be traced 
 ## 6. Decisions you should know about
 
 * **A step is emitted only if the evidence supports it.** Findings cite a `file_id`/`activity_id`/`audit_id` captured at or before `audit_at`. COMPLETE verification steps cite the evidence of the compliant state. Remediation and INCOMPLETE verification steps carry an empty `evidence_id`.
-* **Inferred identity is not proof.** A COMPLETE proof can rest on three kinds of inference: an account known only from deletion-worker activity, absence read from a subject-scoped snapshot, or state read from document/OCR text. Each can support a COMPLETE status, but none produces a verification step by default. Each kind has its own switch (`--emit-proofs`). A proof that rests on two kinds, such as snapshot absence of an activity-attributed account, needs both switches, so a direct state reading never stands in for an uncertain owner. Unresolved accounts get no step; they are never guessed. The comparison of these policies is in section 6 of the evaluation report (`code/analysis/proof_policy_comparison.py`).
+* **Identity may come from later files; state and citations may not.** Link policy S3k lets a file captured after `audit_at` say who owns an account, security-audit record or legal hold. That file never decides what state the record was in at `audit_at` and is never cited. This conflicts with the literal wording of AGENTS.md 6.2 ("Evidence created later must not change the answer"); we follow the sample answers, which AGENTS.md 6.1 calls correct and 9 of which need it. The strict alternative is `link_policy="S2"`. It changes no status, but loses 8 of those sample steps and 152 evaluation steps; see section 6 of the evaluation report.
+* **Inferred proofs are limited.** An account known only from the deletion worker's activity is verified absent when a lookup captured before `audit_at` shows it gone and the attribution holds with ownership known at `audit_at`. Proofs that rest on a subject-scoped snapshot or on document/OCR text are withheld by default (`--emit-proofs`). Unresolved accounts get no step; they are never guessed.
 * **Uncertain evidence cannot establish a violation.** Screenshots tied to a case only by capture time, or conflicting with other evidence, are ignored; screenshot and PDF readings that are grounded in the catalog are usable (MEDIUM confidence).
 * **A case with nothing directly provable is still COMPLETE if nothing contradicts completeness**, with `determination=PARTIAL` and possibly an empty `steps_json` (three evaluation cases). This is a labelling policy (`ClassificationPolicy.unproven_status`), not proof of completion.
 * Switches and their measured effects are listed in section 6 of the evaluation report.

@@ -66,14 +66,16 @@ def main(argv=None):
     ds = load_dataset(a.dataset)
     cr = CaseReconstructor(ds)
     cases = ds.requests.rows + ds.sample_requests.rows
-    verdicts = classify_all(cr, cases)
+    # each population on its own, exactly as `code/main.py` (518 requests) and `predict --samples` (32) run them: account attribution
+    # eliminates candidates across the requests it is given, so classifying both together would describe neither output
+    verdicts = {**classify_all(cr, ds.requests.rows), **classify_all(cr, ds.sample_requests.rows)}
     pol = PlanPolicy.all_inferred() if a.emit_inferred else PlanPolicy()
     plans = plan_all(verdicts, cr.manifest, pol)
     gold = gold_cases(ds)
     samples = [q.case_id for q in ds.sample_requests.rows]
     recon = cr.reconstruct_all([q for q in cases if verdicts[q.case_id].status != NOT_APPLICABLE])
 
-    print(f"policy: emit_inferred_proofs={a.emit_inferred}, include_inferred_account_checks={pol.include_inferred_account_checks}")
+    print(f"plan policy: {pol}")
     print("\n== status (samples) ==")
     print(f"   exact agreement {sum(1 for c in samples if plans[c].status == gold[c][0])}/32; determination of the agreeing cases: "
           f"{dict(Counter(plans[c].determination for c in samples))}")

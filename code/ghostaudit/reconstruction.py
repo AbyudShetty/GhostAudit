@@ -15,7 +15,7 @@ was ignored because it was not usable at ``audit_at``.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from .attribution import AMBIGUOUS, CONTENT, NONE, STRONG, WINDOW_MIN, AccountAttribution, AccountAttributor
@@ -79,11 +79,12 @@ def load_evidence(ds: Dataset, graph: IdentityGraph, use_screenshots: bool = Tru
 
 class CaseReconstructor:
     def __init__(self, ds: Dataset, use_screenshots: bool = True, batch_hours: float = BATCH_HOURS,
-                 window_min: Tuple[float, float] = WINDOW_MIN, require_result_match: bool = True):
+                 window_min: Tuple[float, float] = WINDOW_MIN, require_result_match: bool = True, link_policy: str = DEFAULT_POLICY):
         problems = check_rules(ds.rules.rows)
         if problems:
             raise RulesMismatch("deletion_rules.csv differs from the treatments this program applies: " + "; ".join(problems))
         self.batch_hours = batch_hours
+        self.link_policy = link_policy
         self.ds = ds
         self.graph = build_identity_graph(ds)
         self.results, self.screenshot_notes = load_evidence(ds, self.graph, use_screenshots)
@@ -91,7 +92,7 @@ class CaseReconstructor:
         self.links: LinkIndex = build_link_index(self.graph, self.results, self.manifest, ds.activity.rows)
         self.states = StateReconstructor(self.results, self.manifest, ds.activity.rows)
         self.workflow = WorkflowIndex(ds.activity.rows)
-        self.attributor = AccountAttributor(ds.activity.rows, self.links, window_min, require_result_match)
+        self.attributor = AccountAttributor(ds.activity.rows, self.links, window_min, require_result_match, POLICIES[link_policy])
 
     def user_of(self, case: DeletionRequest) -> str:
         r = self.graph.resolve_request_email(case.email)
@@ -99,11 +100,19 @@ class CaseReconstructor:
             raise ValueError(f"{case.case_id}: request e-mail does not resolve to one user ({r.status})")
         return r.user_ids[0]
 
-    def reconstruct_all(self, cases: Sequence[DeletionRequest], policy: str = DEFAULT_POLICY) -> Dict[str, CaseReconstruction]:
+    def reconstruct_all(self, cases: Sequence[DeletionRequest], policy: Optional[str] = None) -> Dict[str, CaseReconstruction]:
         """Reconstruct every case. Account attribution is global (it eliminates accounts settled for other cases), so the
-        whole deletion-request population should be passed together."""
+        whole deletion-request population should be passed together. The link policy governs both content links and the
+        ownership that attribution relies on, each at the case's own ``audit_at``."""
+        policy = policy or self.link_policy
         pairs = [(c, self.user_of(c)) for c in cases]
-        attribution = self.attributor.attribute(pairs)
+        attribution = self.attributor.attribute(pairs, policy=self.links_policy(policy))
+        if self.links_policy(policy).link_evidence == "any":
+            # a policy that lets later files identify owners: mark activity attributions that only hold because a later file ruled out a
+            # rival account, so that no proof rests on them (classification adds the LATER_OWNERSHIP inference, which nothing allows)
+            strict = self.attributor.attribute(pairs, policy=POLICIES["S2"])
+            attribution = {cid: (replace(a, later_ownership=True) if a.status == STRONG and (strict[cid].status, strict[cid].account) != (a.status, a.account) else a)
+                           for cid, a in attribution.items()}
         by_user: Dict[str, List[DeletionRequest]] = {}
         for c, u in pairs:
             by_user.setdefault(u, []).append(c)
@@ -117,6 +126,10 @@ class CaseReconstructor:
              same_user_cases: Sequence[DeletionRequest] = ()) -> CaseReconstruction:
         assoc = {a.resource_id: a for a in self.links.associations(user, case.audit_at, policy)}
         notes: List[str] = []
+        unused = sorted({(l.resource_id, l.source_id) for l in self.links.links_for_user(user) if l.resource_id not in assoc
+                         and not self.links.admissible(l, case.audit_at, policy)[0]})
+        if unused:  # diagnostic only: these links decide nothing for this case
+            notes.append("not used (not admissible at audit_at, e.g. captured later): " + ", ".join(f"{r} via {s}" for r, s in unused))
         candidates: Dict[str, Tuple[str, Optional[Association]]] = {rid: ("content", a) for rid, a in assoc.items()}
         if att.status == STRONG and att.account and att.account not in candidates:
             candidates[att.account] = ("activity", None)

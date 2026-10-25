@@ -12,14 +12,16 @@ Emission rules (AGENTS.md 6.3 / 6.6, problem_statement "Rules")
 NOT_APPLICABLE  ``[]``.
 INCOMPLETE      findings (cited) for every counted violation; one remediation step per finding (operation chosen by the
                 required treatment); verification (empty ``evidence_id``) for each remediated item, for the subject's account
-                when it is identified, and for each retained record that must remain available. Verification of
+                when it is identified, and for each retained record that must remain available, including one shown missing (it
+                gets no finding and no remediation, because the vocabulary has no operation for either, but its check is still owed). Verification of
                 already-compliant resources that need no remediation is NOT added: the specification asks verification to
                 cover "each remediated record or process" and no sample answer contains such an item.
 COMPLETE        verification steps only, each citing one usable evidence id. A requirement becomes a step only if it is
                 PROVEN, names a resource, has usable evidence, and is *direct proof*. A proof can rest on up to three kinds
                 of inference (``Requirement.inferences``): an account identity attributed from activity, absence read from a
-                subject-scoped snapshot, or state read from document/OCR text. Each kind has its own switch in ``PlanPolicy``,
-                all off by default, and a proof is emitted only when *every* inference it rests on is allowed: a scoped-snapshot
+                subject-scoped snapshot, or state read from document/OCR text. Each kind has its own switch in ``PlanPolicy``
+                (inferred identity on by default, the other two off), and a proof is emitted only when *every* inference it rests
+                on is allowed (``LATER_OWNERSHIP`` never is): a scoped-snapshot
                 proof for an activity-attributed account needs both switches, so a direct state reading never stands in for an
                 uncertain owner. Set-wise proofs name no resource and can never become a step. A COMPLETE case with
                 ``determination=PARTIAL`` therefore carries only the steps that are genuinely proven (possibly none).
@@ -47,7 +49,7 @@ from .timeutil import parse_ts
 @dataclass(frozen=True)
 class PlanPolicy:
     # COMPLETE proofs that rest on an inference; each switch allows one kind, and a proof needs all of its kinds allowed
-    emit_inferred_identity_proofs: bool = False  # the account is the subject's only by deletion-worker activity (unique attribution)
+    emit_inferred_identity_proofs: bool = True  # the account is the subject's only by deletion-worker activity (unique attribution at audit_at)
     emit_scoped_snapshot_proofs: bool = False  # "no profile" read from a snapshot that lists the subject's other records but not a profile
     emit_document_or_ocr_proofs: bool = False  # the state is read from PDF text or screenshot OCR
     include_inferred_account_checks: bool = True  # INCOMPLETE: future "account absent" check for an activity-attributed account
@@ -135,6 +137,9 @@ def _incomplete(v: CaseVerdict, manifest, policy: PlanPolicy, raw: List[Dict[str
     for x in v.counted_violations:
         if x.finding_op is None:
             withheld.append(Withheld("FINDING", x.resource_id, "(retained record missing)", "the output vocabulary has no operation for a missing retained record"))
+            if x.required_action == "RETAIN":
+                # no finding or recovery operation exists for it, but the check that must pass afterwards does (AGENTS.md 6.3)
+                raw.append(_step("VERIFICATION", x.resource_id, VERIFY_FOR_ACTION["RETAIN"], ""))
             continue
         cite = choose_citation(x.evidence_ids, manifest)
         if not cite:

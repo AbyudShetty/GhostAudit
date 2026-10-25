@@ -13,7 +13,7 @@ Link types (strongest first)
 ``DIRECT``     an identifier of the user is inside the resource's own record
 ``DOCUMENT``   a PDF names the resource id and (exactly) identifies the user
 ``REFERENCE``  the resource's own record (which is DIRECT-linked to the user) names another
-               resource id in ``source_resource_id``; that other resource inherits the user
+               resource id in ``source_resource_id``; that other resource inherits every user the record names
 ``TRACE``      the identifier is only on another log line of the same ``trace_id``
 
 Every link keeps its source (file/activity id), the source's capture time, the record's own
@@ -109,7 +109,12 @@ POLICIES: Dict[str, LinkPolicy] = {
     "S3k": LinkPolicy("S3k", False, "any", None, STABLE_SYSTEMS, True,
                       description="as S3, but post-audit sources only for account/security/legal-hold resources, single-user records, single owner"),
 }
-DEFAULT_POLICY = "S3k"  # chosen after the M2 comparison; rationale in code/docs/m2_identity_linking.md
+# S3k: a later file may say *who owns* an account, security-audit record or legal hold (single-subject records, one owner), but state
+# and citations come only from evidence captured at or before audit_at. This reads AGENTS.md 6.2 ("Evidence created later must not
+# change the answer") together with 6.1, which calls sample_output.csv the correct outputs: 9 of them are reachable only this way, and
+# S3k matches all 9 with no unsupported step and no status change in any of the 550 cases. It conflicts with the literal wording of
+# 6.2, so it is an interpretation; S2 (identity only from sources captured by audit_at) remains available for comparison.
+DEFAULT_POLICY = "S3k"
 
 
 @dataclass(frozen=True)
@@ -201,11 +206,14 @@ class LinkIndex:
         if isinstance(ref, str) and o.resource_id:
             m = RESOURCE_ID_RE.fullmatch(ref)
             if m and ref != o.resource_id:
-                for ident, res in resolved:
-                    if ident.field.startswith("fields"):
+                # one link per subject the record names (not just the first one found): a record that names two subjects passes both to
+                # the referenced resource, which then has competing owners and is reported AMBIGUOUS instead of going to whoever came first
+                ref_users = set()
+                for ident, res in resolved:  # source order only picks which identifier each user's link records
+                    if ident.field.startswith("fields") and res.user_ids[0] not in ref_users:
+                        ref_users.add(res.user_ids[0])
                         self._add(self._make(ref, res.user_ids[0], REFERENCE, o.file_id, "file", captured_at, o.observed_at, o.locator,
                                              ident, res, len(users), via=o.resource_id))
-                        break
 
     def add_catalog(self, activities: Iterable[Activity]) -> None:
         for a in sorted(activities, key=lambda a: a.activity_id):

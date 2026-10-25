@@ -298,14 +298,28 @@ class RetainedRecords(unittest.TestCase):
         self.assertEqual(w.verdict(policy=STRICT).status, INCOMPLETE)
         w.close()
 
-    def test_retained_record_identified_only_by_later_evidence_is_identity_without_state(self):
+    def make_later_retained(self):
         w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z")
         w.log("evidence_1", PRE, lookup("2026-09-15T10:00:00Z", "account_10", "ann@x.com"))
-        w.log("evidence_2", POST, [audit_line("2026-09-16T10:00:00Z", "audit_record_1", "user_1")]).build()
+        return w.log("evidence_2", POST, [audit_line("2026-09-16T10:00:00Z", "audit_record_1", "user_1")])
+
+    def test_retained_record_identified_only_by_later_evidence_is_identity_without_state(self):
+        # S3k (default): the later file says the record is the subject's; it cannot say the record existed at audit_at
+        w = self.make_later_retained().build()
         v = w.verdict()
         r = [r for r in v.requirements if r.key == "RETAINED_PRESENT"][0]
         self.assertEqual((r.resource_id, r.status, r.evidence_ids), ("audit_record_1", "UNPROVEN", ()))
         self.assertEqual(v.determination, "PARTIAL")
+        w.close()
+
+    def test_under_s2_the_same_record_is_not_used(self):
+        w = self.make_later_retained().build(link_policy="S2")
+        v = w.verdict()
+        self.assertFalse(any(r.resource_id == "audit_record_1" for r in v.requirements))
+        self.assertEqual((v.status, v.determination), (COMPLETE, "PARTIAL"))
+        self.assertTrue(any(g.code == "RETAINED_NOT_LOCATED" for g in v.gaps))
+        rec = w.cr.reconstruct_all(w.ds.requests.rows)["case_1"]
+        self.assertTrue(any("audit_record_1 via evidence_2" in n for n in rec.notes))  # kept as a diagnostic
         w.close()
 
 
@@ -348,12 +362,13 @@ class RealData(unittest.TestCase):
         cls.ds = real_dataset()
         cls.cr = CaseReconstructor(cls.ds)
         cls.all = cls.ds.requests.rows + cls.ds.sample_requests.rows
-        cls.v = classify_all(cls.cr, cls.all)
+        cls.v = {**classify_all(cls.cr, cls.ds.requests.rows), **classify_all(cls.cr, cls.ds.sample_requests.rows)}  # as the CLI runs each population
 
     def test_status_counts_snapshot(self):
         from collections import Counter
 
         c = Counter((self.v[q.case_id].status, self.v[q.case_id].determination) for q in self.ds.requests.rows)
+        # link policy S3k (under S2: 55 INFERRED, 49 PARTIAL, 51 PROVEN; no status differs between the two)
         self.assertEqual(dict(c), {("COMPLETE", "INFERRED"): 48, ("COMPLETE", "PARTIAL"): 45, ("COMPLETE", "PROVEN"): 62, ("INCOMPLETE", "PROVEN"): 345,
                                    ("INCOMPLETE", "SUPPORTED"): 8, ("NOT_APPLICABLE", "TEXT"): 10})
 
@@ -365,6 +380,7 @@ class RealData(unittest.TestCase):
         self.assertTrue(all(self.v[c].status == s for c, s in gold.items()))
         by = Counter((gold[q.case_id], self.v[q.case_id].determination) for q in self.ds.sample_requests.rows)
         self.assertEqual(dict(by), {("COMPLETE", "PROVEN"): 3, ("COMPLETE", "INFERRED"): 3, ("COMPLETE", "PARTIAL"): 4, ("INCOMPLETE", "PROVEN"): 21, ("INCOMPLETE", "SUPPORTED"): 1})
+        # S3k: case_26 and case_27 are PROVEN because a later file names their accounts (INFERRED under S2)
         # every INCOMPLETE answer has a violation; no COMPLETE answer has one: the statuses are reproduced by findings, not by reported_status
         for c, s in gold.items():
             self.assertEqual(bool(self.v[c].violations), s == "INCOMPLETE", c)

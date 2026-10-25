@@ -102,9 +102,11 @@ CASES: List[Case] = [
                                              ("VERIFICATION", "VERIFY_RECORD_ABSENT", "search_1", ""), ("VERIFICATION", "VERIFY_RECORD_PRESENT", "audit_record_1", ""))),
              "case_2": Expect("COMPLETE", (("VERIFICATION", "VERIFY_RECORD_PRESENT", "audit_record_2", E),))}),
     Case("F", "Account identified only from activity",
-         "A 404 names account_10 but only a worker event ties it to the subject: that is not proof of absence, "
-         "so only the directly proven retained record is verified.",
-         _account_named_only_by_activity, {"case_1": Expect("COMPLETE", (("VERIFICATION", "VERIFY_RECORD_PRESENT", "audit_record_1", E),))}),
+         "A 404 captured before audit_at names account_10, and the only deletion-worker row in the request's window ties it to the subject "
+         "(no rival account, nothing captured later). Both facts are available at audit_at, so the account is verified absent, citing the "
+         "404, next to the directly proven retained record.",
+         _account_named_only_by_activity, {"case_1": Expect("COMPLETE", (("VERIFICATION", "VERIFY_RECORD_ABSENT", "account_10", E),
+                                                                           ("VERIFICATION", "VERIFY_RECORD_PRESENT", "audit_record_1", E)))}),
 ]
 
 

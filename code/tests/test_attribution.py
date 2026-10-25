@@ -186,7 +186,7 @@ class RealDataSafety(unittest.TestCase):
         gold = {r["case_id"]: next(s["resource_id"] for s in json.loads(r["steps_json"]) if s["resource_id"].startswith("account_")) for r in cr.ds.sample_output}
         wrong = [(c, r.account, gold[c]) for c, r in base.items() if c in gold and r.account and r.account != gold[c]]
         self.assertEqual(wrong, [])
-        self.assertEqual(sum(1 for c, r in base.items() if c in gold and r.account == gold[c]), 27)  # measured; not a requirement (26 before case_06's own account stopped being rejected by the result key)
+        self.assertEqual(sum(1 for c, r in base.items() if c in gold and r.account == gold[c]), 27)  # measured; not a requirement. S3k; 25 under S2 (case_18, case_32 ambiguous, truth among the candidates)
         truth = {c: r.account for c, r in base.items() if r.status == CONTENT and c not in gold}
         ids = sorted(truth, key=lambda c: int(c.split("_")[1]))
         hidden = ids[::2]
@@ -204,6 +204,48 @@ class RealDataSafety(unittest.TestCase):
         for cid in ("case_28", "case_29"):
             self.assertEqual((base[cid].status, base[cid].account), (AMBIGUOUS, None))
             self.assertEqual({c.resource_id for c in base[cid].candidates}, {"account_5482", "account_7012"})
+
+
+class RetriedDeleteRows(unittest.TestCase):
+    """An account can have several deletion-worker rows (a retry). All are kept; for a case, the last row inside its window speaks for
+    the account, and the order of system_activity.csv never changes the result."""
+
+    def both_orders(self, rows, cases, **kw):
+        a = attributor(rows, **kw).attribute(cases)
+        b = attributor(rows[::-1], **kw).attribute(cases)
+        self.assertEqual({k: (v.status, v.account, v.candidates, v.rejected) for k, v in a.items()},
+                         {k: (v.status, v.account, v.candidates, v.rejected) for k, v in b.items()})
+        return a
+
+    def test_a_later_retry_outside_the_window_does_not_hide_the_attempt_inside_it(self):
+        c = (mk_case("case_1", "u1@x.com", status="NOT_STARTED"), "user_1")
+        rows = [acct("a1", "account_10", 60, "FAILED"), worker("a2", "account_10", "2026-08-25T09:00:00Z", "SUCCESS")]
+        r = self.both_orders(rows, [c])["case_1"]
+        self.assertEqual((r.status, r.account, r.candidates[0].activity_id), (STRONG, "account_10", "a1"))
+
+    def test_with_two_attempts_in_the_window_the_last_one_counts(self):
+        rows = [acct("a1", "account_10", 60, "FAILED"), acct("a2", "account_10", 10, "SUCCESS")]
+        done = self.both_orders(rows, [(mk_case("case_1", "u1@x.com", status="COMPLETE"), "user_1")])["case_1"]
+        self.assertEqual((done.status, done.account, done.candidates[0].activity_id), (STRONG, "account_10", "a2"))
+        not_started = self.both_orders(rows, [(mk_case("case_1", "u1@x.com", status="NOT_STARTED"), "user_1")])["case_1"]
+        self.assertEqual((not_started.status, not_started.rejected), (NONE, (("account_10", "result SUCCESS incompatible with reported_status NOT_STARTED"),)))
+
+    def test_an_own_account_with_a_retry_is_content_and_names_the_last_row(self):
+        rows = [acct("a1", "account_10", 60, "FAILED"), acct("a2", "account_10", 10, "SUCCESS")]
+        r = self.both_orders(rows, [C1], owned=[("account_10", "user_1")])["case_1"]
+        self.assertEqual((r.status, r.account), (CONTENT, "account_10"))
+        self.assertIn("a2", r.reasons[0])
+
+    def test_shuffled_activity_never_changes_any_attribution(self):
+        rows = [acct("a1", "account_10", 60, "FAILED"), acct("a2", "account_10", 10, "SUCCESS"), acct("a3", "account_11", 50, "SUCCESS"),
+                acct("a4", "account_12", 40, "FAILED"), worker("a5", "account_11", "2026-08-25T09:00:00Z", "FAILED")]
+        cases = [C1, C2, (mk_case("case_3", "u3@x.com", status="NOT_STARTED"), "user_3")]
+        want = {k: (v.status, v.account, v.candidates) for k, v in attributor(rows).attribute(cases).items()}
+        rng = random.Random(7)
+        for _ in range(8):
+            shuffled = rows[:]
+            rng.shuffle(shuffled)
+            self.assertEqual({k: (v.status, v.account, v.candidates) for k, v in attributor(shuffled).attribute(cases).items()}, want)
 
 
 if __name__ == "__main__":

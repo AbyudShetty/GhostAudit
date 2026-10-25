@@ -89,11 +89,19 @@ class MiniDataset(unittest.TestCase):
         self.assertEqual([(e.file_id, e.state, e.reason) for e in d.state.excluded], [("evidence_2", "ABSENT", "file_captured_after_audit")])
 
     def test_post_audit_association_gives_identity_but_no_state(self):
-        d = self.r1.decision("audit_record_1")
+        d = self.r1.decision("audit_record_1")  # S3k (default): identity from the later file, nothing else
         self.assertTrue(d.association.post_audit_only)
         self.assertEqual((d.state.state, d.state.citable, d.state.has_evidence), ("UNKNOWN", (), False))
         self.assertEqual(d.relevance.label, RELEVANT)  # retained record of the subject, by role
         self.assertTrue(any("no state or citation rights" in e for e in d.explanation))
+
+    def test_under_s2_a_record_linked_only_by_a_later_file_is_a_diagnostic_not_a_decision(self):
+        s2 = CaseReconstructor(self.ds, link_policy="S2").reconstruct_all(self.ds.requests.rows)["case_1"]
+        self.assertIsNone(s2.decision("audit_record_1"))  # not a candidate: the link was not knowable at audit_at
+        self.assertTrue(any(n.startswith("not used") and "audit_record_1 via" in n for n in s2.notes))
+        from ghostaudit.linker import DEFAULT_POLICY, POLICIES
+        verdicts = {reason for l, ok, reason in self.cr.links.explain(self.r1.user_id, "audit_record_1", self.r1.audit_at, POLICIES["S2"])}
+        self.assertEqual(verdicts, {"source_after_audit"})  # still indexed and explainable
 
     def test_account_is_content_linked_via_trace_and_cited_from_the_lookup(self):
         d = self.r1.decision("account_10")
@@ -157,7 +165,7 @@ class RealDataRegression(unittest.TestCase):
                     total += 1
                     pred = d.assessment.finding_op if d.assessment.verdict == "VIOLATION" else None
                     agree += pred == fnd.get(rid)
-        self.assertEqual((tp, fp, fn), (97, 0, 14))
+        self.assertEqual((tp, fp, fn), (97, 0, 14))  # S3k; (90, 0, 21) under S2, where 7 answer resources are tied only by later files
         self.assertEqual((agree, total), (97, 97))
 
     def test_sample_other_scenarios_are_excluded_with_the_right_reason(self):

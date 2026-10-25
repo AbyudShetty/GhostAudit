@@ -8,6 +8,7 @@ from ghostaudit.evidence import FileResult, Observation
 from ghostaudit.evidence_index import EvidenceIndex
 from ghostaudit.identity import IdentityGraph
 from ghostaudit.linker import (CATALOG, DEFAULT_POLICY, DIRECT, DOCUMENT, POLICIES, REFERENCE, TRACE, LinkPolicy, build_link_index)
+from ghostaudit.schema import system_for_resource
 import hashlib
 
 AUDIT = "2026-09-15T12:00:00Z"
@@ -213,9 +214,15 @@ class PostAuditPolicies(unittest.TestCase):
         verdicts = {l.resource_id: reason for l, ok, reason in self.idx.explain("user_1", "search_1", AUDIT, POLICIES["S3k"])}
         self.assertEqual(verdicts, {"search_1": "post_audit_system_not_stable"})
 
-    def test_default_policy_is_s3k_and_exists(self):
+    def test_default_policy_is_s3k_later_sources_identify_only_stable_resources(self):
         self.assertEqual(DEFAULT_POLICY, "S3k")
-        self.assertIn(DEFAULT_POLICY, POLICIES)
+        pol = POLICIES[DEFAULT_POLICY]
+        for l in self.idx.links:
+            ok = self.idx.admissible(l, AUDIT, pol)[0]
+            later_ok = system_for_resource(l.resource_id) in ("account_service", "security_service", "legal_service") and l.record_users == 1
+            self.assertEqual(ok, self.idx.eligible(l, AUDIT) or later_ok, l)
+        self.assertEqual(sorted(assoc(self.idx, "user_1", DEFAULT_POLICY)), ["account_1", "account_2", "audit_record_1", "backup_1"])
+        self.assertEqual(sorted(assoc(self.idx, "user_1", "S2")), ["backup_1"])  # the strict policy stays available
 
     def test_association_from_later_file_grants_no_citation_or_state_rights(self):
         ev = EvidenceIndex(self.results, self.man)
@@ -360,6 +367,32 @@ class RealDataLinking(unittest.TestCase):
     def test_all_eval_cases_resolve_and_each_has_associations(self):
         for q in self.ds.requests.rows:
             self.assertTrue(self.a(q.case_id), q.case_id)
+
+
+class SharedReference(unittest.TestCase):
+    """A record naming another resource in source_resource_id passes it to every subject the record names, never just the first."""
+
+    def build(self, first, second):
+        o = obs("e", "export_1", {"source_resource_id": "search_9", "requester_email": first, "cc_email": second})
+        return index([fr("e", [o])], manifest(e=BEFORE))
+
+    def test_both_field_orders_give_both_subjects_and_an_ambiguous_resource(self):
+        for first, second in (("ann.new@x.com", "bob@y.org"), ("bob@y.org", "ann.new@x.com")):
+            idx = self.build(first, second)
+            self.assertEqual(sorted((l.user_id, l.link_type) for l in idx.links_for_resource("search_9")), [("user_1", REFERENCE), ("user_2", REFERENCE)])
+            for user, other in (("user_1", "user_2"), ("user_2", "user_1")):
+                a = assoc(idx, user)["search_9"]
+                self.assertEqual((a.status, a.competing_users), ("AMBIGUOUS", (other,)), (first, user))
+
+    def test_a_record_naming_one_subject_still_passes_the_reference_to_that_subject_only(self):
+        idx = index([fr("e", [obs("e", "export_1", {"source_resource_id": "search_9", "requester_email": "ann.new@x.com"})])], manifest(e=BEFORE))
+        self.assertEqual([(l.user_id, l.link_type) for l in idx.links_for_resource("search_9")], [("user_1", REFERENCE)])
+        self.assertEqual((assoc(idx, "user_1")["search_9"].status, assoc(idx, "user_2")), ("ASSOCIATED", {}))
+
+    def test_two_identifiers_of_the_same_subject_give_one_reference(self):
+        o = obs("e", "export_1", {"source_resource_id": "search_9", "requester_email": "ann.new@x.com", "old_email": "ann.old@x.com"})
+        idx = index([fr("e", [o])], manifest(e=BEFORE))
+        self.assertEqual([(l.user_id, l.link_type) for l in idx.links_for_resource("search_9")], [("user_1", REFERENCE)])
 
 
 if __name__ == "__main__":

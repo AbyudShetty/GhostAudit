@@ -2,7 +2,7 @@
 
     python code/analysis/proof_policy_comparison.py
 
-Policies: the default (no inferred proof), each kind alone, identity + snapshot, and all three. For each it reports, on the 32
+Policies: none (no inferred proof), the default (inferred identity only), and the other combinations with snapshot and OCR proofs. For each it reports, on the 32
 samples, step precision / recall / F1 (our scorer, not the official grader), sequence accuracy and the exact steps it adds; on the
 518 evaluation requests, which have no answers, only *how many* steps it adds, by the kinds of inference they rest on, and every
 added step's ownership and state facts, with the ones that rest on weak ground flagged. Nothing here is a claim of accuracy on the 518.
@@ -25,7 +25,7 @@ for _s in (sys.stdout, sys.stderr):
 
 from ghostaudit.attribution import RESULT_FOR_STATUS, STRONG  # noqa: E402
 from ghostaudit.classification import COMPLETE, NOT_APPLICABLE, classify_all  # noqa: E402
-from ghostaudit.cli import EMIT_CHOICES, plan_policy  # noqa: E402
+from ghostaudit.plan import PlanPolicy  # noqa: E402
 from ghostaudit.dataset import load_dataset  # noqa: E402
 from ghostaudit.plan import plan_all  # noqa: E402
 from ghostaudit.reconstruction import CaseReconstructor  # noqa: E402
@@ -33,8 +33,9 @@ from ghostaudit.scoring import load_cases, score  # noqa: E402
 from ghostaudit.timeutil import parse_ts  # noqa: E402
 
 DATASET = CODE.parent / "dataset"
-POLICIES = [("default", ()), ("inferred-identity", ("inferred-identity",)), ("scoped-snapshot", ("scoped-snapshot",)),
-            ("document-or-ocr", ("document-or-ocr",)), ("identity+snapshot", ("inferred-identity", "scoped-snapshot")), ("all three", EMIT_CHOICES)]
+# (label, (inferred identity, scoped snapshot, document or OCR)); built explicitly so that the defaults do not leak into the comparison
+POLICIES = [("none", (False, False, False)), ("inferred identity (default)", (True, False, False)), ("scoped snapshot only", (False, True, False)),
+            ("identity + snapshot", (True, True, False)), ("identity + OCR", (True, False, True)), ("all three", (True, True, True))]
 
 
 def key(s):
@@ -46,7 +47,8 @@ def pre_elimination_pools(cr, pairs):
     att, out = cr.attributor, {}
     for c, u in pairs:
         want = RESULT_FOR_STATUS.get(c.reported_status)
-        out[c.case_id] = {rid for rid, a in att.events.items() if att._window(c, a)[0] and not att.owners.get(rid) and a.reported_result == want}
+        owners = att.owners_at(c.audit_at)  # ownership knowable at this case's audit_at
+        out[c.case_id] = {rid for rid in att.events for hit in [att.row_for(c, rid)] if hit and not owners.get(rid) and hit[0].reported_result == want}
     return out
 
 
@@ -59,8 +61,8 @@ def facts(cr, case, rec, req, pools):
         others = sorted(c for c, p in pools.items() if c != case.case_id and rid in p)
         if rec.account.status == STRONG and others:
             flags.append("attribution depends on eliminating " + ", ".join(others))
-        ev = cr.attributor.events.get(rid)
-        f["worker"] = ev.reported_result if ev else "-"
+        hit = cr.attributor.row_for(case, rid)
+        f["worker"] = hit[0].reported_result if hit else "-"
     if "scoped_snapshot" in req.inferences:
         flags.append("absence = not listed in a subject-scoped snapshot")
         if f.get("worker") in ("FAILED", "PARTIAL"):
@@ -85,11 +87,12 @@ def main():
         dels = [c for c in cases if v[c.case_id].status != NOT_APPLICABLE]
         recs = cr.reconstruct_all(dels)
         sets[label] = (cases, v, recs, pre_elimination_pools(cr, [(c, recs[c.case_id].user_id) for c in dels]))
-    base = {label: plan_all(sets[label][1], cr.manifest) for label in sets}
+    none = PlanPolicy(emit_inferred_identity_proofs=False, emit_scoped_snapshot_proofs=False, emit_document_or_ocr_proofs=False)
+    base = {label: plan_all(sets[label][1], cr.manifest, none) for label in sets}
     print(f"{'policy':18} {'TP':>4} {'FP':>3} {'FN':>3} {'precision':>9} {'recall':>7} {'F1':>7} {'sequence':>8}  sample steps added | eval steps added")
     detail = []
-    for name, on in POLICIES:
-        pol = plan_policy(on)
+    for name, (ident, snap, ocr) in POLICIES:
+        pol = PlanPolicy(emit_inferred_identity_proofs=ident, emit_scoped_snapshot_proofs=snap, emit_document_or_ocr_proofs=ocr)
         plans = {label: plan_all(sets[label][1], cr.manifest, pol) for label in sets}
         pred = {c: (p.status, list(p.steps)) for c, p in plans["samples"].items()}
         rep = score(pred, ref)

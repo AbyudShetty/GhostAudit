@@ -70,7 +70,7 @@ class World:
         self.acts.append([aid, ts, event, "deletion_worker", target, rid, result, f"worker {rid}"])
         return self
 
-    def build(self, policy=ClassificationPolicy()):
+    def build(self, policy=ClassificationPolicy(), link_policy=None):
         self._dir = tempfile.mkdtemp(prefix="ghostaudit_test_")
         atexit.register(shutil.rmtree, self._dir, True)
         root = Path(self._dir)
@@ -96,7 +96,7 @@ class World:
             (root / p).write_text(body, encoding="utf-8", newline="\n")
         self.ds = load_dataset(root)
         assert self.ds.issues() == [], self.ds.issues()
-        self.cr = CaseReconstructor(self.ds, use_screenshots=False)
+        self.cr = CaseReconstructor(self.ds, use_screenshots=False, **({"link_policy": link_policy} if link_policy else {}))
         self.policy = policy
         return self
 

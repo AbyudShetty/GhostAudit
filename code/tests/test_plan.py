@@ -113,6 +113,27 @@ class IncompleteCase(unittest.TestCase):
         self.assertTrue(any("no operation for a missing retained record" in x.reason for x in p.withheld))
         w.close()
 
+    def test_missing_retained_record_still_gets_the_check_that_must_pass_afterwards(self):
+        # AGENTS.md 6.3: an INCOMPLETE case lists "the checks that must pass after remediation", with an empty evidence_id. There is no
+        # finding or recovery operation for a missing retained record, so the check is the only step about it.
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z")
+        w.log("evidence_1", PRE, lookup("2026-09-15T10:00:00Z", "account_10", "ann@x.com") + [audit_line("2026-09-15T10:05:00Z", "audit_record_1", "user_1", rows=0)]).build()
+        p = plan_for(w)
+        mine = [o for o in ops(p) if o[2] == "audit_record_1"]
+        self.assertEqual(mine, [("VER", "VERIFY_RECORD_PRESENT", "audit_record_1", "")])
+        self.assertEqual(violations(p), [])  # schema-valid: future verification in an INCOMPLETE case, state PRESENT, no evidence id
+        self.assertEqual([s["system_id"] for s in p.steps if s["resource_id"] == "audit_record_1"], ["security_service"])
+        w.close()
+
+    def test_an_expired_retained_record_that_is_gone_is_owed_nothing(self):
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z")
+        w.log("evidence_1", PRE, lookup("2026-09-15T10:00:00Z", "account_10", "ann@x.com")
+              + [audit_line("2026-09-15T10:05:00Z", "audit_record_1", "user_1", retention="2026-09-01T00:00:00Z", rows=0), search_line()]).build()
+        p = plan_for(w)
+        self.assertEqual(p.status, INCOMPLETE)  # because of the search record, not the expired audit record
+        self.assertNotIn("audit_record_1", {s["resource_id"] for s in p.steps})
+        w.close()
+
 
 class CompleteCase(unittest.TestCase):
     def test_direct_proofs_become_cited_verification_steps_only(self):
@@ -157,13 +178,16 @@ class InferredEvidenceIsNotDirectProof(unittest.TestCase):
         w.log("evidence_1", PRE, [self.bare("2026-09-15T10:00:00Z", "account_10", 0), audit_line("2026-09-15T10:05:00Z", "audit_record_1", "user_1")])
         return w.build()
 
-    def test_activity_attributed_account_is_not_proof_of_absence_by_default(self):
+    def test_activity_attributed_account_proof_is_emitted_by_default_and_marked_inferred(self):
         w = self.strong_world()
         v = classify_all(w.cr, w.ds.requests.rows)["case_1"]
-        self.assertEqual((v.status, v.determination), (COMPLETE, "INFERRED"))  # M4 still reports it as supported
-        p = build_plan(v, w.cr.manifest)
-        self.assertEqual([o[2] for o in ops(p)], ["audit_record_1"])
-        self.assertTrue(any(x.resource_id == "account_10" and "inferred_identity" in x.reason for x in p.withheld))
+        self.assertEqual((v.status, v.determination), (COMPLETE, "INFERRED"))  # the verdict still says how it is supported
+        req = next(r for r in v.requirements if r.resource_id == "account_10")
+        self.assertEqual((req.kind, req.inferences), ("inferred_identity", ("inferred_identity",)))
+        self.assertEqual([o[2] for o in ops(build_plan(v, w.cr.manifest))], ["account_10", "audit_record_1"])
+        off = build_plan(v, w.cr.manifest, PlanPolicy(emit_inferred_identity_proofs=False))
+        self.assertEqual([o[2] for o in ops(off)], ["audit_record_1"])
+        self.assertTrue(any(x.resource_id == "account_10" and "inferred_identity" in x.reason for x in off.withheld))
         w.close()
 
     def test_the_switch_emits_it_with_the_same_citation(self):
@@ -225,7 +249,7 @@ class ProofPolicyPerKind(unittest.TestCase):
         self.assertEqual(plan_policy([], emit_all=True), PlanPolicy.all_inferred())
         self.assertEqual(plan_policy([]), PlanPolicy())
         self.assertEqual((PlanPolicy().emit_inferred_identity_proofs, PlanPolicy().emit_scoped_snapshot_proofs, PlanPolicy().emit_document_or_ocr_proofs),
-                         (False, False, False))  # the submission default: no inferred proof (change deliberately, see the evaluation report)
+                         (True, False, False))  # the submission default: inferred-identity proofs only (see the evaluation report)
 
     # ---- 1. activity-inferred identity ---------------------------------------------------------------------------------------------
     def test_unique_attribution_with_an_explicit_404_is_emitted_only_by_the_identity_switch(self):
@@ -281,13 +305,27 @@ class ProofPolicyPerKind(unittest.TestCase):
         self.assertEqual(reasons, {"proof rests on inferred_identity, not direct evidence"})
         w.close()
 
+    @staticmethod
+    def catalog(w, ts, rid="account_10", email="ann@x.com"):
+        """A data-catalog row naming the account and the subject's e-mail: identity only, no state."""
+        w.acts.append(["activity_9", ts, "LINK_RESOURCE_IDENTITY", "data_catalog", "account_service", rid, "SUCCESS", f"Catalog entry {rid} belongs to {email}"])
+        return w
+
     def test_snapshot_absence_for_an_identifier_linked_account_needs_only_the_snapshot_switch(self):
-        # the subject's e-mail names account_10 only in a log captured after audit_at: identity yes (a stable account), state no
+        # a catalog row before audit_at names account_10 with the subject's e-mail: identity by identifier, state from the snapshot only
         w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z").json("evidence_2", SNAP_PRE, snapshot(SNAP_PRE))
-        w.log("evidence_3", POST, lookup("2026-09-16T10:00:00Z", "account_10", "ann@x.com", rows=0)).build()
+        self.catalog(w, "2026-09-10T10:00:00Z").build()
         self.assertEqual(self.account_steps(w, policy()), [])
         self.assertEqual(self.account_steps(w, policy(ID, OCR)), [])
         self.assertEqual(self.account_steps(w, policy(SCOPED)), [("VER", "VERIFY_RECORD_ABSENT", "account_10", "evidence_2")])
+        w.close()
+
+    def test_under_s2_the_same_identifier_link_captured_after_audit_at_counts_for_nothing(self):
+        # identical, but the catalog row comes after audit_at: under S2 the account is known only from activity, so both switches are needed
+        w = World().case("case_1").worker("activity_1", "account_10", "2026-08-22T11:00:00Z").json("evidence_2", SNAP_PRE, snapshot(SNAP_PRE))
+        self.catalog(w, "2026-09-16T10:00:00Z").build(link_policy="S2")
+        self.assertEqual(self.account_steps(w, policy(SCOPED)), [])
+        self.assertEqual(self.account_steps(w, policy(ID, SCOPED)), [("VER", "VERIFY_RECORD_ABSENT", "account_10", "evidence_2")])
         w.close()
 
     def test_a_snapshot_that_does_not_cover_the_subject_supports_nothing(self):
@@ -482,7 +520,7 @@ class RealData(unittest.TestCase):
         cls.ds = real_dataset()
         cls.cr = CaseReconstructor(cls.ds)
         cls.cases = cls.ds.requests.rows + cls.ds.sample_requests.rows
-        cls.v = classify_all(cls.cr, cls.cases)
+        cls.v = {**classify_all(cls.cr, cls.ds.requests.rows), **classify_all(cls.cr, cls.ds.sample_requests.rows)}  # as the CLI runs each population
         cls.plans = plan_all(cls.v, cls.cr.manifest)
         cls.gold = {r["case_id"]: (r["deletion_status"], json.loads(r["steps_json"])) for r in cls.ds.sample_output}
         cls.score = score
@@ -524,7 +562,8 @@ class RealData(unittest.TestCase):
                 p = {(s["resource_id"], s["operation"]) for s in self.plans[c].steps if s["phase"] == ph}
                 m += len(g & p); miss += len(g - p); uns += len(p - g)
             tallies[ph] = (m, miss, uns)
-        self.assertEqual(tallies, {"FINDING": (41, 0, 0), "REMEDIATION": (41, 0, 0), "VERIFICATION": (92, 19, 0)})
+        # S3k + inferred-identity proofs: (93, 18, 0). S3k alone (92, 19, 0); S2 (83, 28, 0)
+        self.assertEqual(tallies, {"FINDING": (41, 0, 0), "REMEDIATION": (41, 0, 0), "VERIFICATION": (93, 18, 0)})
 
     def test_a_finding_always_carries_the_answers_cited_file_on_samples(self):
         for c in (q.case_id for q in self.ds.sample_requests.rows):
@@ -540,10 +579,16 @@ class RealData(unittest.TestCase):
         for c in ("case_23", "case_28", "case_29", "case_04", "case_08"):
             self.assertFalse(any(s["resource_id"].startswith("account_") for s in self.plans[c].steps), c)
 
-    def test_inferred_proofs_are_withheld_on_samples_21_25_31(self):
-        for c, rid in (("case_21", "account_6440"), ("case_25", "account_3136"), ("case_31", "account_4857")):
+    def test_inferred_identity_proofs_on_samples(self):
+        # case_21: activity attribution that holds with ownership known at audit_at, plus an eligible 404 -> emitted, as in the answer
+        self.assertIn({"step_no": 1, "phase": "VERIFICATION", "system_id": "account_service", "resource_id": "account_6440",
+                       "operation": "VERIFY_RECORD_ABSENT", "state": "ABSENT", "evidence_id": "evidence_92"}, list(self.plans["case_21"].steps))
+        # case_25: unique only because a later file says account_5684 is user_26's -> withheld (LATER_OWNERSHIP), citation recorded
+        # case_31: subject-scoped snapshot (switch off) and also later ownership -> withheld
+        for c, rid, why in (("case_25", "account_3136", "proof rests on later_ownership, not direct evidence"),
+                            ("case_31", "account_4857", "proof rests on scoped_snapshot+later_ownership, not direct evidence")):
             self.assertNotIn(rid, {s["resource_id"] for s in self.plans[c].steps}, c)
-            self.assertTrue(any(w.resource_id == rid and w.would_cite for w in self.plans[c].withheld), c)
+            self.assertTrue(any(w.resource_id == rid and w.reason == why and w.would_cite for w in self.plans[c].withheld), c)
 
     def test_complete_cases_with_nothing_provable(self):
         empty = sorted(c for c, p in self.plans.items() if p.status == COMPLETE and not p.steps)
@@ -599,7 +644,8 @@ class RealData(unittest.TestCase):
     def test_two_full_runs_are_identical(self):
         from ghostaudit.reconstruction import CaseReconstructor
 
-        again = plan_all(classify_all(CaseReconstructor(self.ds), self.cases), self.cr.manifest)
+        cr = CaseReconstructor(self.ds)
+        again = plan_all({**classify_all(cr, self.ds.requests.rows), **classify_all(cr, self.ds.sample_requests.rows)}, self.cr.manifest)
         self.assertEqual({c: p.steps_json() for c, p in again.items()}, {c: p.steps_json() for c, p in self.plans.items()})
 
 

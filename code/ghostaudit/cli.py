@@ -59,7 +59,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p_pred.add_argument("--samples", action="store_true", help="predict the 32 sample requests instead of the 518 evaluation requests")
     for p in (p_sub, p_pred):
         p.add_argument("--emit-proofs", dest="emit", action="append", choices=EMIT_CHOICES, default=[],
-                       help="also emit COMPLETE proofs that rest on this kind of inference (repeatable; all off by default). A proof that rests on two kinds needs both")
+                       help="also emit COMPLETE proofs that rest on this kind of inference (repeatable; inferred-identity is on by default, the others off). A proof that rests on two kinds needs both")
         p.add_argument("--emit-inferred-proofs", action="store_true", help="shorthand for every --emit-proofs kind")
     args = ap.parse_args(argv)
 
