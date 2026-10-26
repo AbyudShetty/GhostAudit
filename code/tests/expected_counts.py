@@ -1,6 +1,6 @@
 """Expected per-file counts, measured independently of the parsers.
 
-Method (see code/docs/design_decisions.md): raw byte/line counting on the evidence files,
+Method (see docs/design_decisions.md): raw byte/line counting on the evidence files,
 with no parser code involved:
   sql   : lines starting with INSERT (units); minus INSERT INTO snapshot_scope (observations)
   json  : occurrences of the byte string "resource_id" (units == observations)

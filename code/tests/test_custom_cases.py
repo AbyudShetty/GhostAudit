@@ -3,7 +3,7 @@ import unittest
 
 from tests.helpers import CODE_DIR
 
-sys.path.insert(0, str(CODE_DIR / "evaluation"))
+sys.path.insert(0, str(CODE_DIR.parent / "evaluation"))
 import custom_cases  # noqa: E402
 
 

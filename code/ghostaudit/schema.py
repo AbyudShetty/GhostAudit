@@ -21,7 +21,7 @@ STATUSES = ("COMPLETE", "INCOMPLETE", "NOT_APPLICABLE")
 STEP_FIELDS = ("step_no", "phase", "system_id", "resource_id", "operation", "state", "evidence_id")
 OUTPUT_COLUMNS = ("case_id", "deletion_status", "steps_json")
 
-# (phase, operation, state) in the exact order of problem_statement.md "Allowed Operations".
+# (phase, operation, state) in the exact order of docs/challenge/problem_statement.md "Allowed Operations".
 _OPERATION_TABLE = (
     ("FINDING", "REPORT_REMAINING_RECORD", "PRESENT"),
     ("FINDING", "REPORT_EXPOSED_PII", "PRESENT"),
@@ -101,7 +101,7 @@ _CASE_RE = re.compile(r"^case_(\d+)$")
 # How output.csv rows are ordered. The contract only says "sorted by case_id" and never says how, so this is a decision, not a fact:
 #   "numeric"       case_33 before case_100: the order of dataset/deletion_requests.csv (and of every other organizer table whose ids mix widths)
 #   "lexicographic" plain text order: case_100 before case_33
-# The evidence for each reading is in code/docs/design_decisions.md ("Row order"). Everything that writes, validates or scores rows goes
+# The evidence for each reading is in docs/design_decisions.md ("Row order"). Everything that writes, validates or scores rows goes
 # through case_sort_key, so this one constant is the only thing to change (tests/test_row_order.py then needs its pinned expectations updated).
 CASE_ORDER = "numeric"
 

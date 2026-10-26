@@ -1,18 +1,58 @@
-# generated caches and scratch files (added in M3; the OCR cache code/ghostaudit/data/screenshot_ocr.json is intentionally NOT ignored)
+# Credentials and machine-local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.aws/
+.claude/
+.codex/
+.agents/
+
+# Python environments, caches and build products
+.venv/
+venv/
+env/
 __pycache__/
 *.py[cod]
+*.egg-info/
+build/
+dist/
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
 .coverage
-*.tmp
-scratch/
+.coverage.*
+coverage.xml
+htmlcov/
 
-# the submission archive is a build product (python code/tools/package.py); in-progress writes too
+# Challenge inputs and generated submission artifacts
+/dataset/
+/output.csv
+/samples.csv
 /code.zip
-*.part
+/code_test.zip
+/agent-trace/
+/agent-trace.zip
 
-# generated artifacts and local logs
-dataset/dataset.zip
-output.csv
-code.zip
-log.txt
+# Agent transcripts, experiments and generated per-case reports
+/log.txt
+/local/
+/.benchmarks/
+/scratch/
+/code/evaluation/m5_case_report.md
+
+# Editors, OS metadata and interrupted writes
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.part
+*.swp
+*~
+
+# code/ghostaudit/data/screenshot_ocr.json is required runtime data; keep it tracked.

@@ -24,7 +24,7 @@ Do not skip logging or rewrite old log entries. Sub-agents and worktrees use the
 
 ## 1. What This Repo Is
 
-This is a starter repo for the **HackerRank Orchestrate** challenge: **Ghost Data Still Exists**.
+This repository contains **GhostAudit**, built for the **HackerRank Orchestrate (October 2026)** challenge: **Ghost Data Still Exists**.
 
 Participants must build an AI-powered deletion-audit agent. For every request in `dataset/deletion_requests.csv`, the agent first determines whether the person actually requested deletion. For an authorized deletion, it reconstructs the person's current and historical identifiers, searches global activity and evidence, applies the supplied deletion policy, and decides whether the deletion is complete.
 
@@ -38,7 +38,7 @@ The final submission must produce `output.csv` with:
 case_id,deletion_status,steps_json
 ```
 
-Read `problem_statement.md` for the full participant-facing specification.
+Read `docs/challenge/problem_statement.md` for the full participant-facing specification.
 
 ---
 

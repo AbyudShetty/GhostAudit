@@ -6,8 +6,8 @@ from pathlib import Path
 
 from tests.helpers import CODE_DIR, needs_dataset, real_dataset
 
-EVAL = CODE_DIR / "evaluation" / "evaluation_report.md"
-USAGE = CODE_DIR / "evaluation" / "usage_report.md"
+EVAL = CODE_DIR.parent / "evaluation" / "evaluation_report.md"
+USAGE = CODE_DIR.parent / "evaluation" / "usage_report.md"
 README = CODE_DIR.parent / "README.md"
 
 

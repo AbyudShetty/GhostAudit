@@ -1,7 +1,7 @@
 """Row order of output.csv: the contract says "sorted by case_id" without saying how. This module pins (1) the evidence we found,
 (2) the choice made on it, and (3) that the choice is one constant, so a later decision costs one line and touches nothing else.
 
-Evidence for each reading is written up in code/docs/design_decisions.md ("Row order")."""
+Evidence for each reading is written up in docs/design_decisions.md ("Row order")."""
 
 import csv
 import json
@@ -21,7 +21,7 @@ from ghostaudit.schema import case_sort_key, parse_output_csv, validate_output_r
 MIXED = ["case_100", "case_33", "case_9", "case_550", "case_1000"]
 NUMERIC = ["case_9", "case_33", "case_100", "case_550", "case_1000"]
 LEXICOGRAPHIC = ["case_100", "case_1000", "case_33", "case_550", "case_9"]
-STATEMENT = CODE_DIR.parent / "problem_statement.md"
+STATEMENT = CODE_DIR.parent / "docs/challenge/problem_statement.md"
 
 
 def row(cid):
@@ -72,7 +72,7 @@ class TheSwitch(unittest.TestCase):
 class Evidence(unittest.TestCase):
     """What the supplied materials do and do not say (these pass today; a failure means the materials changed and the choice deserves a second look)."""
 
-    @unittest.skipUnless(STATEMENT.is_file(), "problem_statement.md is not part of code.zip")
+    @unittest.skipUnless(STATEMENT.is_file(), "challenge problem statement is not available")
     def test_the_statement_gives_no_qualifier(self):
         text = STATEMENT.read_text(encoding="utf-8")
         sentences = [l for l in text.splitlines() if "sorted by `case_id`" in l]

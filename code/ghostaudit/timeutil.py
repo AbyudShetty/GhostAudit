@@ -3,7 +3,7 @@
 All timestamps in the dataset are UTC, formatted ``YYYY-MM-DDTHH:MM:SSZ``.
 Parsing is strict: anything else raises ``ValueError`` rather than guessing.
 
-Audit-time rule (problem_statement.md / AGENTS.md sections 6.2 and 6.6):
+Audit-time rule (docs/challenge/problem_statement.md / AGENTS.md sections 6.2 and 6.6):
 evidence captured *after* ``audit_at`` must not change the answer and must
 never be cited. The boundary is inclusive: ``captured_at == audit_at`` is
 eligible (evidence_51 is captured exactly at case_31's audit time and is cited

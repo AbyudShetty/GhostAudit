@@ -152,7 +152,7 @@ class RealDataRegression(unittest.TestCase):
         cls.recs = cls.cr.reconstruct_all(cls.cases)
 
     def test_samples_scope_and_state_snapshot(self):
-        # Snapshot of measured values reported in code/docs/m3_state_and_scenario.md (not a requirement).
+        # Snapshot of measured values reported in docs/history/state-reconstruction.md (not a requirement).
         gold = {r["case_id"]: json.loads(r["steps_json"]) for r in self.ds.sample_output}
         tp = fp = fn = agree = total = 0
         for q in self.ds.sample_requests.rows:

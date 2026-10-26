@@ -353,7 +353,7 @@ class RealDataLinking(unittest.TestCase):
         self.assertEqual(ev.citable_ids("account_3866", self.q["case_27"].audit_at), ["evidence_92"])
 
     def test_documented_sample_policy_metrics_regression(self):
-        # Snapshot of values measured and reported in code/docs/m2_identity_linking.md; not a requirement.
+        # Snapshot of values measured and reported in docs/history/identity-linking.md; not a requirement.
         import json
 
         gold = {r["case_id"]: {s["resource_id"] for s in json.loads(r["steps_json"])} for r in self.ds.sample_output}

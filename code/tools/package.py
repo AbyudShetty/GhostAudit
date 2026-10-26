@@ -5,8 +5,8 @@
     python code/tools/package.py --verify code.zip     # verify an existing archive only
     python code/tools/package.py --verify code.zip --dataset dataset   # also fail on dataset identifiers in unexpected files
 
-Layout (the repository README's own rule): ``README.md`` and ``code/`` at the archive root, with the two reports at
-``code/evaluation/``. Nothing from ``dataset/`` is included. Verification reads the archive back, not the working tree.
+Layout: ``README.md``, ``code/``, ``docs/`` and ``evaluation/`` at the archive root, with the required reports at
+``evaluation/``. Nothing from ``dataset/`` or ``local/`` is included. Verification reads the archive back, not the working tree.
 Exit code 0 = built/verified, 1 = problems found (listed), 2 = bad usage.
 """
 
@@ -22,9 +22,10 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 REPO = Path(__file__).resolve().parents[2]
 
-REQUIRED = ("README.md", "code/main.py", "code/evaluation/evaluation_report.md", "code/evaluation/usage_report.md", "code/ghostaudit/__init__.py", "code/ghostaudit/cli.py")
+REQUIRED = ("README.md", "code/main.py", "evaluation/evaluation_report.md", "evaluation/usage_report.md", "code/ghostaudit/__init__.py", "code/ghostaudit/cli.py")
+SOURCE_DIRS = ("code", "docs", "evaluation")
 EXCLUDED_DIRS = {"__pycache__", ".venv", "venv", "env", "node_modules", ".git", ".pytest_cache", ".mypy_cache", ".idea", ".vscode", ".ruff_cache"}
-EXCLUDED_NAMES = {".DS_Store", "Thumbs.db", ".env", "output.csv", "log.txt"}
+EXCLUDED_NAMES = {".DS_Store", "Thumbs.db", "output.csv", "log.txt"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo", ".tmp", ".part", ".log"}
 ARCHIVE_SUFFIXES = {".zip", ".tar", ".gz", ".tgz", ".7z", ".rar", ".bz2", ".xz", ".tbz2", ".jar", ".whl"}
 # Generated per-case reports quote sample records and sample answers one-for-one; they stay in the repository, not in the archive.
@@ -33,6 +34,7 @@ EXCLUDED_FILES = {
     "code/docs/m3_sample_report.md": "per-case dump of sample requests",
     "code/docs/m4_sample_report.md": "per-case dump of sample requests",
     "code/docs/m5_sample_report.md": "per-case dump of sample requests and sample answers",
+    "code/evaluation/m5_case_report.md": "generated per-case report",
 }
 DATASET_FILENAMES = {"deletion_requests.csv", "sample_deletion_requests.csv", "sample_output.csv", "user_identities.csv", "user_audit_log.csv",
                      "system_activity.csv", "deletion_rules.csv", "evidence_files.csv", "output.csv"}
@@ -53,8 +55,8 @@ LOCAL_PATH_PATTERNS = [
     ("local home path", re.compile(r"/(?:Users|home)/[A-Za-z0-9._-]+/")),
 ]
 REPORT_KEYWORDS: Dict[str, Tuple[str, ...]] = {
-    "code/evaluation/evaluation_report.md": ("status accuracy", "step-level", "field-level", "sequence", "additional evaluation case", "failures found", "improvements"),
-    "code/evaluation/usage_report.md": ("provider", "model calls", "input tokens", "output tokens", "per request", "cost"),
+    "evaluation/evaluation_report.md": ("status accuracy", "step-level", "field-level", "sequence", "additional evaluation case", "failures found", "improvements"),
+    "evaluation/usage_report.md": ("provider", "model calls", "input tokens", "output tokens", "per request", "cost"),
 }
 MAGIC = (("zip", b"PK\x03\x04"), ("zip", b"PK\x05\x06"), ("gzip", b"\x1f\x8b"), ("7z", b"7z\xbc\xaf\x27\x1c"), ("rar", b"Rar!"), ("bzip2", b"BZh"), ("xz", b"\xfd7zXZ\x00"))
 
@@ -62,11 +64,15 @@ MAGIC = (("zip", b"PK\x03\x04"), ("zip", b"PK\x05\x06"), ("gzip", b"\x1f\x8b"), 
 def is_excluded(rel: PurePosixPath) -> Optional[str]:
     """Why a repository-relative path is kept out of the archive (None = include)."""
     parts = rel.parts
+    if parts and parts[0] == "local":
+        return "local working files"
     if parts and parts[0] == "dataset":
         return "dataset"
     if any(p in EXCLUDED_DIRS for p in parts[:-1]):
         return "cache/venv directory"
     name = rel.name
+    if name == ".env" or name.startswith(".env.") or rel.suffix.lower() in {".pem", ".key"}:
+        return "credentials/local configuration"
     if name in EXCLUDED_NAMES:
         return "excluded file name"
     if rel.suffix.lower() in EXCLUDED_SUFFIXES:
@@ -83,7 +89,9 @@ def is_excluded(rel: PurePosixPath) -> Optional[str]:
 def collect(root: Path) -> Tuple[List[Tuple[str, Path]], List[Tuple[str, str]]]:
     """(arcname, source) pairs to include, and (path, reason) pairs that were skipped, both sorted."""
     include, skipped = [], []
-    candidates = [root / "README.md"] + sorted(p for p in (root / "code").rglob("*") if p.is_file())
+    candidates = [root / "README.md"]
+    for directory in SOURCE_DIRS:
+        candidates.extend(sorted(p for p in (root / directory).rglob("*") if p.is_file()))
     for p in candidates:
         if not p.is_file():
             continue
@@ -138,8 +146,8 @@ def verify(path: Path, dataset: Optional[Path] = None) -> Tuple[List[str], List[
         for n in names:
             if "\\" in n or n.startswith("/") or ".." in PurePosixPath(n).parts or re.match(r"^[A-Za-z]:", n):
                 problems.append(f"unsafe entry name: {n!r}")
-            elif n != "README.md" and not n.startswith("code/"):
-                problems.append(f"unexpected top-level entry (only README.md and code/ belong in the archive): {n}")
+            elif n != "README.md" and PurePosixPath(n).parts[0] not in SOURCE_DIRS:
+                problems.append(f"unexpected top-level entry (allowed: README.md, code/, docs/, evaluation/): {n}")
             why = is_excluded(PurePosixPath(n))
             if why:
                 problems.append(f"{n}: must not be in the archive ({why})")
@@ -265,8 +273,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     target = args.verify
     if target is None:
         out = (args.out or args.root / "code.zip").resolve()
-        if args.root.resolve() in out.parents and "code" in out.relative_to(args.root.resolve()).parts[:1]:
-            print("refusing to write the archive inside code/ (it would be packaged into itself)", file=sys.stderr)
+        if args.root.resolve() in out.parents and out.relative_to(args.root.resolve()).parts[0] in SOURCE_DIRS:
+            print("refusing to write the archive inside code/, docs/ or evaluation/ (it would be packaged into itself)", file=sys.stderr)
             return 2
         count, skipped = build(args.root, out)
         from collections import Counter

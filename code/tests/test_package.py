@@ -20,8 +20,9 @@ GOOD = {
     "code/ghostaudit/__init__.py": "",
     "code/ghostaudit/cli.py": "def main():\n    return 0\n",
     "code/tests/test_x.py": "import unittest\n",
-    "code/evaluation/evaluation_report.md": REPORT,
-    "code/evaluation/usage_report.md": USAGE,
+    "docs/architecture.md": "# Architecture\n",
+    "evaluation/evaluation_report.md": REPORT,
+    "evaluation/usage_report.md": USAGE,
 }
 
 
@@ -67,8 +68,10 @@ class Build(unittest.TestCase):
             "code/ghostaudit/__pycache__/cli.cpython-310.pyc": b"\x00junk", "code/ghostaudit/old.pyc": b"x", "code/.venv/lib/x.py": "x=1\n", "code/venv/y.py": "y=1\n",
             "code/node_modules/z.js": "1", "code/.pytest_cache/v": "1", "code/nested.zip": b"PK\x03\x04", "code/backup.tar.gz": b"\x1f\x8b", "code/data/deletion_requests.csv": "a,b\n",
             "code/data/sample_output.csv": "a\n", "code/docs/m5_sample_report.md": "dump", "code/docs/m3_sample_report.md": "dump", "code/notes.tmp": "t", "code/.DS_Store": b"x",
-            "code/.env": "SECRET=1", "code/log.txt": "log", "code/output.csv": "o",
-            "dataset/deletion_requests.csv": "a\n", "output.csv": "o", "log.txt": "l", "stray.txt": "not under code/",
+            "code/.env": "SECRET=1", "code/.env.local": "SECRET=1", "evaluation/.env.production": "SECRET=1",
+            "docs/signing.pem": "private", "code/log.txt": "log", "code/output.csv": "o",
+            "dataset/deletion_requests.csv": "a\n", "local/reports/sample.md": "private report",
+            "output.csv": "o", "log.txt": "l", "stray.txt": "outside source directories",
         })
         out = self.tmp / "o.zip"
         count, skipped = package.build(self.root, out)
@@ -79,13 +82,16 @@ class Build(unittest.TestCase):
         self.assertEqual(reasons["code/backup.tar.gz"], "nested archive")
         self.assertIn("per-case dump", reasons["code/docs/m5_sample_report.md"])
         self.assertEqual(reasons["code/data/deletion_requests.csv"], "dataset file name")
-        self.assertNotIn("dataset/deletion_requests.csv", reasons)  # only README.md and code/ are ever considered
+        self.assertNotIn("dataset/deletion_requests.csv", reasons)  # only README.md and the source directories are considered
         self.assertNotIn("stray.txt", reasons)
         self.assertEqual(package.verify(out)[0], [])
 
-    def test_refuses_to_write_the_archive_inside_code(self):
-        self.assertEqual(package.main(["--root", str(self.root), "--out", str(self.root / "code" / "x.zip")]), 2)
-        self.assertFalse((self.root / "code" / "x.zip").exists())
+    def test_refuses_to_write_the_archive_inside_source_directories(self):
+        for directory in package.SOURCE_DIRS:
+            with self.subTest(directory=directory):
+                target = self.root / directory / "x.zip"
+                self.assertEqual(package.main(["--root", str(self.root), "--out", str(target)]), 2)
+                self.assertFalse(target.exists())
 
     def test_cli_builds_and_verifies(self):
         out = self.tmp / "cli.zip"
@@ -122,7 +128,7 @@ class Verify(unittest.TestCase):
         self.assertEqual(self.problems(GOOD), [])
 
     def test_missing_required_files_and_tests(self):
-        for rel in ("README.md", "code/main.py", "code/evaluation/evaluation_report.md", "code/evaluation/usage_report.md"):
+        for rel in ("README.md", "code/main.py", "evaluation/evaluation_report.md", "evaluation/usage_report.md"):
             self.has(self.problems({k: v for k, v in GOOD.items() if k != rel}), f"missing required file: {rel}")
         self.has(self.problems({k: v for k, v in GOOD.items() if k != "code/tests/test_x.py"}), "no tests")
 
@@ -147,6 +153,10 @@ class Verify(unittest.TestCase):
         self.has(self.problems({**GOOD, "code/.venv/bin/python": "x"}), "cache/venv directory")
         self.has(self.problems({**GOOD, "notes.txt": "x"}), "unexpected top-level entry")
         self.has(self.problems({**GOOD, "code/docs/m4_sample_report.md": "x"}), "per-case dump")
+        self.has(self.problems({**GOOD, "local/reports/sample.md": "x"}), "local working files")
+        for name in ("code/.env", "evaluation/.env.production", "docs/signing.key"):
+            with self.subTest(name=name):
+                self.has(self.problems({**GOOD, name: "sensitive"}), "credentials/local configuration")
 
     def test_unsafe_entry_names(self):
         for name in ("code" + chr(92) + "evil.py", "../escape.py", "code/../../escape.py", "/abs.py", "C:/abs.py"):
@@ -164,9 +174,9 @@ class Verify(unittest.TestCase):
         self.has(self.problems({**GOOD, "code/ghostaudit/bad.py": "def (:\n"}), "does not compile")
 
     def test_reports_must_be_real_and_cover_their_topics(self):
-        self.has(self.problems({**GOOD, "code/evaluation/evaluation_report.md": "# short\n"}), "too short")
-        self.has(self.problems({**GOOD, "code/evaluation/evaluation_report.md": "x" * 900}), "required topic missing: 'status accuracy'")
-        self.has(self.problems({**GOOD, "code/evaluation/usage_report.md": "y" * 900}), "required topic missing: 'input tokens'")
+        self.has(self.problems({**GOOD, "evaluation/evaluation_report.md": "# short\n"}), "too short")
+        self.has(self.problems({**GOOD, "evaluation/evaluation_report.md": "x" * 900}), "required topic missing: 'status accuracy'")
+        self.has(self.problems({**GOOD, "evaluation/usage_report.md": "y" * 900}), "required topic missing: 'input tokens'")
 
     def test_oversized_file_and_bad_archives(self):
         self.has(self.problems({**GOOD, "code/big.txt": "a" * (package.MAX_FILE_BYTES + 1)}), "bytes (>")
@@ -254,8 +264,12 @@ class RealTree(unittest.TestCase):
         self.assertTrue({n for n in names if n.startswith("code/tests/test_")})
         self.assertIn("code/ghostaudit/data/screenshot_ocr.json", names)  # needed at run time
         self.assertIn("code/requirements.txt", names)
+        self.assertIn("docs/architecture.md", names)
+        self.assertIn("evaluation/evaluation_report.md", names)
+        self.assertIn("evaluation/usage_report.md", names)
+        self.assertNotIn("code/evaluation/evaluation_report.md", names)
         for n in names:
-            self.assertTrue(n == "README.md" or n.startswith("code/"), n)
+            self.assertTrue(n == "README.md" or n.split("/")[0] in package.SOURCE_DIRS, n)
             self.assertNotIn("__pycache__", n)
             self.assertFalse(n.endswith((".pyc", ".csv", ".zip", ".log")), n)
             self.assertNotIn(n.split("/")[-1], {"output.csv", "log.txt", ".env"})

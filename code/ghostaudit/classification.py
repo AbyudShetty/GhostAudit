@@ -30,7 +30,7 @@ Determination (how well the status is supported)
   NOT_APPLICABLE: ``TEXT``
 
 The one genuine policy choice is the status of a ``PARTIAL`` case (``ClassificationPolicy.unproven_status``); see
-``code/docs/m4_classification.md``.
+``docs/history/classification.md``.
 """
 
 from __future__ import annotations
